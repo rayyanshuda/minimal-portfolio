@@ -339,34 +339,23 @@ export default function Home() {
           <ul className="work-list">
             <li>
               <a className="underlined" href="#">
-                alembic.space
+                CloudAct CPA
               </a>{" "}
-              <span className="muted">| aesthetic thinking tool. WIP manifesto</span>
+              <span className="muted">| testing and developing ai agents</span>
             </li>
+            {/*             
             <li className="muted bullet">curate beautiful and shareable micro-essays with ease</li>
             <li className="muted bullet">
               micro-essay: the essay&apos;s exploratory nature with the aphorism&apos;s impact
             </li>
             <li className="muted bullet">
               the internet-native medium for ideas: write once, share everywhere
-            </li>
+            </li> */}
             <li>
               <a className="underlined" href="#">
-                lab.alembic.space
+                WAT.ai
               </a>{" "}
-              <span className="muted">| generative design suite in the browser</span>
-            </li>
-            <li className="muted bullet">part of the alembic visual ecosystem</li>
-            <li className="muted bullet">120+ shaders and counting</li>
-            <li className="muted bullet nested">each layerable on any image</li>
-            <li className="muted bullet nested">
-              searchable by vibes (semantic search via cosine similarity to shader description vector embeddings)
-            </li>
-            <li>
-              <a className="underlined" href="#">
-                banger.garden
-              </a>{" "}
-              <span className="muted">| exclusive tweet curation experiment</span>
+              <span className="muted">| machine learning projects</span>
             </li>
             <li>
               <a className="underlined" href="#">
