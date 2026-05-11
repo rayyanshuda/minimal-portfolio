@@ -1,48 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# rayyan huda
 
-## Getting Started
 
-First, run the development server:
+i'm drawn to minimal aesthetics. not because it's trendy, but because there's something honest about conveying an idea with only what it needs. nothing more. you strip away the noise and what's left is either something real or nothing at all.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+my design follows that same logic.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Spotify Widget Setup
+## what you'll find here
 
-To enable the sidebar Spotify widget, create a `.env.local` file with:
+if you want answers, you have to be willing to look for it. go explore.
 
-```bash
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
-SPOTIFY_REFRESH_TOKEN=your_refresh_token
-```
 
-The widget shows your current track if you are actively listening, and falls back to your most recently played track.
+## art
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+I've fallen in love with countless forms of art, and although I am far from being considered as an artist, I love dipping my toes in each and every water, to find new passions. 
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+a lot of people have a lot of definitions. mine is simple:
 
-## Learn More
+> art is anything with value.
 
-To learn more about Next.js, take a look at the following resources:
+photography. music. a conversation that changes how you see something. a person. everything can be inspected to find art, you just have to be looking.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+pursuing it, is what makes a life feel like more than just a sequence of days. 
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# find your purpose and chase it
 
-## Deploy on Vercel
+here's a poem i wrote 
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> I'll reach for the stars\
+> Even if it bruises my shoulders\
+> Breaks my hands\
+> Or turns me into a fiery ball of ash
+>
+> They told me to be realistic\
+> As if the stars care about realistic\
+> As if that boy died in vain\
+> And not in glory
+>
+> I have been warned about burning\
+> About reaching too high\
+> About the cost of wanting something\
+> That was never meant for hands like mine
+>
+> I would rather be a fiery ball of ash\
+> Falling from somewhere worth falling from\
+> Than a man who kept both hands safe\
+> And never left the ground
