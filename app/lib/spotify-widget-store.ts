@@ -15,7 +15,8 @@ export type SpotifyWidgetData = {
 };
 
 const SESSION_KEY = "rh-spotify-widget";
-const POLL_MS = 8_000;
+const POLL_PLAYING_MS = 8_000;
+const POLL_IDLE_MS = 60_000;
 const FETCH_TIMEOUT_MS = 12_000;
 
 type Snapshot = {
@@ -28,6 +29,7 @@ let cachedError = "";
 let listeners = new Set<() => void>();
 let fetchInFlight: Promise<void> | null = null;
 let pollingStarted = false;
+let pollTimeoutId: number | null = null;
 
 function notify() {
   for (const listener of listeners) listener();
@@ -56,6 +58,29 @@ function getSnapshot(): Snapshot {
   return { data: cachedData, error: cachedError };
 }
 
+function pollDelayMs() {
+  return cachedData?.isPlaying ? POLL_PLAYING_MS : POLL_IDLE_MS;
+}
+
+function clearPollTimeout() {
+  if (pollTimeoutId !== null) {
+    window.clearTimeout(pollTimeoutId);
+    pollTimeoutId = null;
+  }
+}
+
+function schedulePoll() {
+  clearPollTimeout();
+  pollTimeoutId = window.setTimeout(() => {
+    pollTimeoutId = null;
+    if (document.visibilityState === "visible") {
+      void requestLoad(true).finally(schedulePoll);
+    } else {
+      schedulePoll();
+    }
+  }, pollDelayMs());
+}
+
 export function subscribeSpotify(listener: () => void) {
   listeners.add(listener);
   return () => {
@@ -80,7 +105,15 @@ async function loadSpotify(silent: boolean, attempt = 0): Promise<void> {
     writeSession(next);
     notify();
   } catch (e) {
-    if (!silent || !cachedData) {
+    const fallback = cachedData ?? readSession();
+    if (fallback) {
+      cachedData = fallback;
+      cachedError = "";
+      notify();
+      return;
+    }
+
+    if (!silent) {
       if (attempt < 1) {
         await new Promise((resolve) => window.setTimeout(resolve, 800));
         return loadSpotify(silent, attempt + 1);
@@ -114,16 +147,12 @@ function startPolling() {
 
   if (!cachedData) cachedData = readSession();
   void requestLoad(Boolean(cachedData));
-
-  window.setInterval(() => {
-    if (document.visibilityState === "visible") {
-      void requestLoad(true);
-    }
-  }, POLL_MS);
+  schedulePoll();
 
   const onVisibilityChange = () => {
     if (document.visibilityState === "visible") {
       void requestLoad(true);
+      schedulePoll();
     }
   };
   document.addEventListener("visibilitychange", onVisibilityChange);
