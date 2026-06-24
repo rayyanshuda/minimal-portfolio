@@ -1660,10 +1660,11 @@ body:has(> .rh-page) {
 
 .rh-avatar .rh-bubble {
   opacity: 0;
+  pointer-events: none;
   transform: translate(6px, -50%);
   transition: opacity 0.28s ease, transform 0.28s ease;
 }
-.rh-avatar:hover .rh-bubble {
+.rh-avatar:has(img:hover) .rh-bubble {
   opacity: 1;
   transform: translate(0, -50%);
 }

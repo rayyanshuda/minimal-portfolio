@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Minimal Portfolio",
-  description: "Minimalist portfolio inspired by editorial layouts",
+  title: "Rayyan Huda's Portfolio",
+  description: "minimalist portfolio inspired by editorial layouts",
   icons: {
     // Tab bar follows the OS / browser color scheme, not your site’s data-theme.
     // White mark for dark UI; black mark for light UI.
