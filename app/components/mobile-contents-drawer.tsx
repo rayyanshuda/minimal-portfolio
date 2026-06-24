@@ -65,19 +65,22 @@ export default function MobileContentsDrawer({ title = "contents", activeId, ite
 
       <aside className={isOpen ? "mobile-contents-drawer open" : "mobile-contents-drawer"} aria-label="Mobile contents">
         <div className="mobile-contents-header">
-          <p className="contents-title">{title}</p>
+          <p className="rh-muted rh-aside-label">{title}</p>
           <button type="button" className="mobile-contents-close" aria-label="Close contents" onClick={() => setIsOpen(false)}>
             ×
           </button>
         </div>
 
-        <ul>
-          {items.map((item) => (
-            <li key={item.id}>
-              {item.href ? (
+        <nav className="rh-aside-nav">
+          {items.map((item) => {
+            const className = `rh-aside-link rh-clink${activeId === item.id ? " is-active" : " rh-muted"}`;
+
+            if (item.href) {
+              return (
                 <a
+                  key={item.id}
                   href={item.href}
-                  className={activeId === item.id ? "contents-link active" : "contents-link"}
+                  className={className}
                   onClick={(event) => {
                     if (item.onSelect) {
                       event.preventDefault();
@@ -87,18 +90,16 @@ export default function MobileContentsDrawer({ title = "contents", activeId, ite
                 >
                   {item.label}
                 </a>
-              ) : (
-                <button
-                  type="button"
-                  className={activeId === item.id ? "contents-link contents-link-button active" : "contents-link contents-link-button"}
-                  onClick={() => handleSelect(item)}
-                >
-                  {item.label}
-                </button>
-              )}
-            </li>
-          ))}
-        </ul>
+              );
+            }
+
+            return (
+              <button key={item.id} type="button" className={className} onClick={() => handleSelect(item)}>
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
       </aside>
     </>
   );

@@ -1,525 +1,231 @@
- "use client";
+"use client";
 
-import { useEffect, useRef, useState } from "react";
-import MobileContentsDrawer from "@/app/components/mobile-contents-drawer";
-import MobileThemeToggle from "@/app/components/mobile-theme-toggle";
+import { useEffect, useState } from "react";
+import RhPageShell from "@/app/components/rh-page-shell";
+
+/* ------------------------------------------------------------------ *
+ *  TYPES + DATA
+ * ------------------------------------------------------------------ */
+
+type Filter = "all" | "cv" | "ml" | "swe";
 
 const sectionNav = [
   { id: "work", label: "work" },
   { id: "projects", label: "projects" },
-  { id: "blog", label: "blog" },
+  { id: "research", label: "research" },
+  { id: "writing", label: "writing" },
   { id: "passions", label: "passions" },
   { id: "connect", label: "connect" },
 ];
 
-type SpotifyWidgetData = {
-  isPlaying: boolean;
-  title: string;
-  artist: string;
-  songUrl: string;
-  albumImageUrl: string;
-  profileName: string;
-  profileUsername: string;
-  profileImageUrl: string;
-  profileUrl: string;
-};
+const work = [
+  { name: "CloudAct CPA", href: "https://cloudact.ca/", note: "testing and developing ai agents" },
+  { name: "WAT.ai", href: "https://watai.ca/", note: "machine learning projects" },
+  { name: "github", href: "https://github.com/rayyanshuda", note: "miscellaneous coding projects" },
+  { name: "systems design engineering, uwaterloo", href: "https://uwaterloo.ca/systems-design-engineering/", note: "undergraduate studies" },
+];
 
-function OverflowMarquee({ text }: { text: string }) {
-  const viewportRef = useRef<HTMLSpanElement | null>(null);
-  const [isOverflowing, setIsOverflowing] = useState(false);
-  const [overflowDistance, setOverflowDistance] = useState(0);
+const allProjects = [
+  { cat: "cv",  name: "deep learning skin lesion classifier", tag: "computer vision",  href: "https://github.com/rayyanshuda/skin-lesion-class",  desc: "detecting skin cancer by analyzing dermoscopic images with deep learning." },
+  { cat: "ml",  name: "ai voice assistant agent",            tag: "machine learning", href: "https://github.com/rayyanshuda/ai-voice-assistant", desc: "an offline conversational agent with system-level commands and live transcription." },
+  { cat: "swe", name: "url shortener",                       tag: "software",         href: "https://github.com/rayyanshuda/url-shortener",     desc: "turns a long url, with an optional custom alias, into a short, shareable link." },
+];
 
-  useEffect(() => {
-    const checkOverflow = () => {
-      const viewport = viewportRef.current;
-      if (!viewport) return;
-      const distance = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
-      setIsOverflowing(distance > 1);
-      setOverflowDistance(distance);
-    };
+// TODO: replace these placeholders with your real papers + links.
+const papers = [
+  { tag: "computer vision",  title: "lightweight cnns for dermoscopic skin-lesion classification", venue: "undergraduate research · 2025", cta: "pdf", href: "#" },
+  { tag: "machine learning", title: "self-supervised pretraining for medical imaging",             venue: "in review",                   cta: "pdf", href: "#" },
+];
 
-    checkOverflow();
-    const viewport = viewportRef.current;
-    if (!viewport) return;
+const blogs = [
+  { name: "my machine learning journey", tag: "essay", href: "/blog/my-machine-learning-journey" },
+  { name: "3d modelling",                tag: "essay", href: "/blog/3d-modelling" },
+];
 
-    const observer = new ResizeObserver(() => {
-      checkOverflow();
-    });
+const filterDefs: { key: Filter; label: string }[] = [
+  { key: "all", label: "all" },
+  { key: "cv",  label: "computer vision" },
+  { key: "ml",  label: "machine learning" },
+  { key: "swe", label: "software" },
+];
 
-    observer.observe(viewport);
-    return () => observer.disconnect();
-  }, [text]);
+/* shared mono-label style */
+const mono = (extra: React.CSSProperties = {}): React.CSSProperties => ({
+  fontFamily: "'Spline Sans Mono', monospace",
+  ...extra,
+});
 
-  return (
-    <span
-      ref={viewportRef}
-      className={isOverflowing ? "marquee-viewport is-overflow" : "marquee-viewport"}
-      style={{ "--marquee-distance": `-${overflowDistance}px` } as Record<string, string>}
-    >
-      <span className="marquee-track">
-        <span className="marquee-segment">{text}</span>
-      </span>
-    </span>
-  );
-}
-
+/* ------------------------------------------------------------------ *
+ *  PAGE
+ * ------------------------------------------------------------------ */
 export default function Home() {
-  const [activeSection, setActiveSection] = useState<string>("work");
-  const [theme, setTheme] = useState<"midnight" | "snow" | "coffee-cream" | "dusty-blue">("midnight");
-  const [isThemeReady, setIsThemeReady] = useState(false);
-  const [spotifyData, setSpotifyData] = useState<SpotifyWidgetData | null>(null);
-  const [spotifyError, setSpotifyError] = useState<string>("");
-  const [homeBubbleText, setHomeBubbleText] = useState("this is home");
-  const [isHomeBubbleTextVisible, setIsHomeBubbleTextVisible] = useState(true);
-  const [homeBubbleWidth, setHomeBubbleWidth] = useState<number>(0);
-  const homeBubbleTimeoutsRef = useRef<number[]>([]);
-  const homeBubbleMeasureRef = useRef<HTMLSpanElement | null>(null);
+  const [filter, setFilter] = useState<Filter>("all");
+  const [active, setActive] = useState("work");
 
-  const applyTheme = (nextTheme: "midnight" | "snow" | "coffee-cream" | "dusty-blue") => {
-    document.documentElement.setAttribute("data-theme", nextTheme);
-    document.body.setAttribute("data-theme", nextTheme);
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.history.replaceState(null, "", `#${id}`);
   };
 
-  const scrollToSection = (sectionId: string) => {
-    const target = document.getElementById(sectionId);
-    if (!target) return;
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
-    window.history.replaceState(null, "", `#${sectionId}`);
-  };
-
-  const handleSectionClick = (event: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
-    event.preventDefault();
-    scrollToSection(sectionId);
-  };
-
+  /* scroll-spy: highlight the active section in the contents nav */
   useEffect(() => {
-    const sectionElements = sectionNav
-      .map(({ id }) => document.getElementById(id))
-      .filter((element): element is HTMLElement => element !== null);
-
-    if (sectionElements.length === 0) return;
-
-    let ticking = false;
-
-    const updateActiveSection = () => {
-      const probeY = window.scrollY + window.innerHeight * 0.32;
-      let nextActive = sectionElements[0].id;
-
-      for (const section of sectionElements) {
-        if (section.offsetTop <= probeY) {
-          nextActive = section.id;
-        } else {
-          break;
-        }
-      }
-
-      setActiveSection((current) => (current === nextActive ? current : nextActive));
-      ticking = false;
-    };
-
+    const els = sectionNav
+      .map((s) => document.getElementById(s.id))
+      .filter((e): e is HTMLElement => e !== null);
+    if (!els.length) return;
     const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(updateActiveSection);
+      const probe = window.scrollY + window.innerHeight * 0.3;
+      let next = els[0].id;
+      for (const el of els) {
+        if (el.offsetTop <= probe) next = el.id;
+        else break;
+      }
+      setActive((cur) => (cur === next ? cur : next));
     };
-
-    updateActiveSection();
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
-
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
   }, []);
 
-  useEffect(() => {
-    const storedTheme = window.localStorage.getItem("theme");
-    if (
-      storedTheme === "snow" ||
-      storedTheme === "midnight" ||
-      storedTheme === "coffee-cream" ||
-      storedTheme === "dusty-blue"
-    ) {
-      setTheme(storedTheme);
-      applyTheme(storedTheme);
-      setIsThemeReady(true);
-      return;
-    }
+  const projects = filter === "all" ? allProjects : allProjects.filter((p) => p.cat === filter);
 
-    applyTheme("midnight");
-    setIsThemeReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isThemeReady) return;
-    applyTheme(theme);
-    window.localStorage.setItem("theme", theme);
-  }, [theme, isThemeReady]);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadSpotifyTrack = async () => {
-      try {
-        const response = await fetch("/api/spotify", { cache: "no-store" });
-        if (!response.ok) {
-          const errorJson = (await response.json()) as { message?: string };
-          throw new Error(errorJson.message ?? "Failed to load Spotify track.");
-        }
-
-        const data = (await response.json()) as SpotifyWidgetData;
-        if (!isMounted) return;
-
-        setSpotifyData(data);
-        setSpotifyError("");
-      } catch (error) {
-        if (!isMounted) return;
-        setSpotifyError(error instanceof Error ? error.message : "Spotify widget unavailable.");
-      }
-    };
-
-    void loadSpotifyTrack();
-    const intervalId = window.setInterval(() => {
-      void loadSpotifyTrack();
-    }, 30000);
-
-    return () => {
-      isMounted = false;
-      window.clearInterval(intervalId);
-    };
-  }, []);
-
-  const projects: { name: string; description: string; href?: string }[] = [
-    {
-      name: "deep learning skin lesion classifier",
-      description: "support the detection of skin cancer by utilizing deep learning to analyze dermoscopic images.",
-    },
-    { name: "url shortener",
-      description: "users input a long url (and optionally a custom alias) to generate a short, shareable link." },
-    {
-      name: "ai voice assistant agent",
-      description: "offline conversational agent with system level commands and conversation transcription.",
-    },
-  ];
-
-  const blogs = [
-    {
-      name: "my machine learning journey",
-      href: "/blog/my-machine-learning-journey",
-    },
-    {
-      name: "3d modelling",
-      href: "/blog/3d-modelling",
-    },
-  ];
-
-  const clearHomeBubbleSequence = () => {
-    homeBubbleTimeoutsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
-    homeBubbleTimeoutsRef.current = [];
-  };
-
-  const measureHomeBubbleWidth = (text: string) => {
-    const measureElement = homeBubbleMeasureRef.current;
-    if (!measureElement) return 0;
-    const previousText = measureElement.textContent ?? "";
-    measureElement.textContent = text;
-    const width = Math.ceil(measureElement.getBoundingClientRect().width);
-    measureElement.textContent = previousText;
-    return width;
-  };
-
-  const transitionHomeBubbleText = (nextText: string) => {
-    setIsHomeBubbleTextVisible(false);
-    const fadeTimeout = window.setTimeout(() => {
-      const nextWidth = measureHomeBubbleWidth(nextText);
-      if (nextWidth > 0) setHomeBubbleWidth(nextWidth);
-      setHomeBubbleText(nextText);
-      const fadeInTimeout = window.setTimeout(() => {
-        setIsHomeBubbleTextVisible(true);
-      }, 40);
-      homeBubbleTimeoutsRef.current.push(fadeInTimeout);
-    }, 180);
-    homeBubbleTimeoutsRef.current.push(fadeTimeout);
-  };
-
-  const startHomeBubbleSequence = () => {
-    clearHomeBubbleSequence();
-    setHomeBubbleText("this is home");
-    setIsHomeBubbleTextVisible(true);
-    const initialWidth = measureHomeBubbleWidth("this is home");
-    if (initialWidth > 0) setHomeBubbleWidth(initialWidth);
-
-    const secondLineTimeout = window.setTimeout(() => {
-      transitionHomeBubbleText("go explore, i have nothing more to say");
-    }, 3000);
-
-    const thirdLineTimeout = window.setTimeout(() => {
-      transitionHomeBubbleText("i mean it, i can be here forever");
-    }, 6000);
-
-    homeBubbleTimeoutsRef.current = [secondLineTimeout, thirdLineTimeout];
-  };
-
-  const stopHomeBubbleSequence = () => {
-    clearHomeBubbleSequence();
-    setHomeBubbleText("this is home");
-    setIsHomeBubbleTextVisible(true);
-  };
-
-  useEffect(() => {
-    return () => {
-      clearHomeBubbleSequence();
-    };
-  }, []);
-
-  useEffect(() => {
-    const measureElement = homeBubbleMeasureRef.current;
-    if (!measureElement) return;
-    setHomeBubbleWidth(Math.ceil(measureElement.getBoundingClientRect().width));
-  }, [homeBubbleText]);
+  /* ---- small reusable bits ---- */
+  const SectionHead = ({ n, title }: { n: string; title: string }) => (
+    <div style={{ display: "flex", alignItems: "baseline", gap: 13, marginBottom: 15 }}>
+      <span className="rh-muted" style={mono({ fontSize: 11 })}>{n}</span>
+      <h2 style={{ margin: 0, fontSize: 22, fontWeight: 500, letterSpacing: "-0.01em" }}>{title}</h2>
+      <span className="rh-div" style={{ flex: 1, height: 1 }} />
+    </div>
+  );
 
   return (
-    <div className="page-layout">
-      <MobileThemeToggle />
-      <MobileContentsDrawer
-        activeId={activeSection}
-        items={sectionNav.map((section) => ({
-          id: section.id,
-          label: section.label,
-          href: `#${section.id}`,
-          onSelect: () => scrollToSection(section.id),
-        }))}
-      />
-      <aside className="contents-nav" aria-label="Contents">
-        <p className="contents-title">contents</p>
-        <ul>
-          {sectionNav.map((section) => (
-            <li key={section.id}>
-              <a
-                href={`#${section.id}`}
-                className={activeSection === section.id ? "contents-link active" : "contents-link"}
-                onClick={(event) => handleSectionClick(event, section.id)}
-              >
-                {section.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </aside>
-
-      <main className="portfolio">
-        <header className="site-header">
-          <div className="site-headline">
-            <h1 className="site-name">rayyan huda</h1>
-            <span className="profile-avatar" onMouseEnter={startHomeBubbleSequence} onMouseLeave={stopHomeBubbleSequence}>
-                <img src="/hermes-statue.png" alt="Rayyan Huda profile" className="profile-image" />
-                <span
-                  className="speech-bubble"
-                  style={homeBubbleWidth > 0 ? { width: `${homeBubbleWidth}px` } : undefined}
-                >
-                  <span className={isHomeBubbleTextVisible ? "speech-bubble-text" : "speech-bubble-text is-hidden"}>
-                    {homeBubbleText}
-                  </span>
-                </span>
-                <span ref={homeBubbleMeasureRef} className="speech-bubble speech-bubble-measure">
-                  {homeBubbleText}
-                </span>
-              </span>
-          </div>
-
-          
-
-
-          <div className="divider" />
-        </header>
-
-        <section className="section" id="work">
-          <h2>work</h2>
-          <ul className="work-list">
-            <li>
-              <a className="underlined" href="#">
-                CloudAct CPA
-              </a>{" "}
-              <span className="muted">| testing and developing ai agents</span>
-            </li>
-            {/*             
-            <li className="muted bullet">curate beautiful and shareable micro-essays with ease</li>
-            <li className="muted bullet">
-              micro-essay: the essay&apos;s exploratory nature with the aphorism&apos;s impact
-            </li>
-            <li className="muted bullet">
-              the internet-native medium for ideas: write once, share everywhere
-            </li> */}
-            
-            <li>
-              <a className="underlined" href="#">
-                WAT.ai
-              </a>{" "}
-              <span className="muted">| machine learning projects</span>
-            </li>
-            <li>
-              <a className="underlined" href="#">
-                github
-              </a>{" "}
-              <span className="muted">| miscellaneous coding projects</span>
-            </li>
-            <li>
-              <a className="underlined" href="#">
-                systems design engineering @ university of waterloo
-              </a>{" "}
-              <span className="muted">| the academic hustle</span>
-            </li>
-          </ul>
-        </section>
-
-        <section className="section projects" id="projects">
-          <h2>Projects</h2>
-          <ul className="project-list">
-            {projects.map((project) => (
-              <li key={project.name}>
-                <a className="project-card-link" href={project.href ?? "#"}>
-                  <span className="project-title">{project.name}</span>
-                  <p className="project-description">{project.description}</p>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="section blog" id="blog">
-          <h2>Blog</h2>
-          <ul className="project-list">
-            {blogs.map((blog) => (
-              <li key={blog.name}>
-                <a className="project-card-link" href={blog.href}>
-                  <span className="project-title">{blog.name}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="section passions" id="passions">
-          <h2>the fruits of my passions</h2>
-          <p>
-            <a className="underlined" href="/poetry">
-              poetry
-            </a>{" "}
-            |{" "}
-            <a className="underlined" href="/photography">
-              photography
-            </a>{" "}
-            |{" "}
-            <a className="underlined" href="/free-verse">
-              free verse
-            </a>
-          </p>
-        </section>
-
-        <section className="section connect" id="connect">
-          <h2>connect</h2>
-          <p>
-            <a className="underlined" href="mailto:rayyanshuda@gmail.com">
-              email
-            </a>{" "}
-            |{" "}
-            <a className="underlined" href="https://www.linkedin.com/in/rayyanhuda/" target="_blank" rel="noreferrer">
-              linkedin
-            </a>{" "}
-            |{" "}
-            <a className="underlined" href="https://x.com/rayyanshuda" target="_blank" rel="noreferrer">
-              twitter
-            </a>
-          </p>
-        </section>
-      </main>
-
-      <aside className="theme-nav" aria-label="Theme controls">
-        <p className="contents-title">appearance</p>
-        <button
-          type="button"
-          className={theme === "midnight" ? "theme-link active" : "theme-link"}
-          onClick={() => setTheme("midnight")}
-          aria-pressed={theme === "midnight"}
-        >
-          midnight
-        </button>
-        <button
-          type="button"
-          className={theme === "snow" ? "theme-link active" : "theme-link"}
-          onClick={() => setTheme("snow")}
-          aria-pressed={theme === "snow"}
-        >
-          snow
-        </button>
-        <button
-          type="button"
-          className={theme === "coffee-cream" ? "theme-link active" : "theme-link"}
-          onClick={() => setTheme("coffee-cream")}
-          aria-pressed={theme === "coffee-cream"}
-        >
-          coffee-cream
-        </button>
-        <button
-          type="button"
-          className={theme === "dusty-blue" ? "theme-link active" : "theme-link"}
-          onClick={() => setTheme("dusty-blue")}
-          aria-pressed={theme === "dusty-blue"}
-        >
-          dusty-blue
-        </button>
-
-        <div className="spotify-widget" aria-live="polite">
-          <p className="contents-title">spotify</p>
-          {spotifyData ? (
-            <a href={spotifyData.songUrl} className="spotify-card" target="_blank" rel="noreferrer">
-              {spotifyData.albumImageUrl ? (
-                <img
-                  src={spotifyData.albumImageUrl}
-                  alt={`Album art for ${spotifyData.title}`}
-                  className="spotify-art"
-                />
-              ) : (
-                <div className="spotify-art spotify-art-fallback" aria-hidden="true">
-                  ♪
-                </div>
-              )}
-              <div className="spotify-track">
-                <p className="spotify-status">{spotifyData.isPlaying ? "now playing" : "last played"}</p>
-                <p className="spotify-title">
-                  <OverflowMarquee text={spotifyData.title} />
-                </p>
-                <p className="spotify-artist">
-                  <OverflowMarquee text={spotifyData.artist} />
-                </p>
+    <RhPageShell
+      activeContentId={active}
+      contentsItems={sectionNav.map((s) => ({
+        id: s.id,
+        label: s.label,
+        href: `#${s.id}`,
+        onSelect: () => scrollToSection(s.id),
+      }))}
+    >
+          <header>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 20 }}>
+              <div>
+                <h1 style={{ margin: 0, fontSize: 46, fontWeight: 400, lineHeight: 1, letterSpacing: "-0.015em" }}>rayyan huda</h1>
+                <div className="rh-muted" style={mono({ marginTop: 13, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase" })}>machine learning · computer vision · software</div>
               </div>
-            </a>
-          ) : (
-            <p className="spotify-error">{spotifyError || "loading..."}</p>
-          )}
-        </div>
-        <div className="spotify-profile-card">
-          <p className="spotify-profile-label">profile</p>
-          <div className="spotify-profile-row">
-            <a href={spotifyData?.profileUrl || "https://open.spotify.com"} target="_blank" rel="noreferrer">
-              <img
-                src={spotifyData?.profileImageUrl || "/cat_ocean.PNG"}
-                alt="Rayyan Huda Spotify profile"
-                className="spotify-profile-image"
-              />
-            </a>
-            <a
-              href={spotifyData?.profileUrl || "https://open.spotify.com"}
-              target="_blank"
-              rel="noreferrer"
-              className="spotify-profile-name"
-            >
-              {spotifyData?.profileName || spotifyData?.profileUsername || "rhuda"}
-            </a>
-          </div>
-        </div>
-      </aside>
-    </div>
+              <span className="rh-avatar" style={{ position: "relative", display: "inline-flex", alignItems: "center", flex: "none" }}>
+                <span className="rh-bubble" style={mono({ position: "absolute", right: "calc(100% + 12px)", top: "50%", whiteSpace: "nowrap", background: "var(--spotify-card-bg)", color: "var(--spotify-card-text)", fontSize: 10.5, letterSpacing: "0.04em", padding: "7px 10px", borderRadius: 2 })}>teaching machines to see ✶</span>
+                <img src="/hermes-statue.png" alt="rayyan huda" style={{ height: 66, width: "auto", display: "block", opacity: 0.92 }} />
+              </span>
+            </div>
+            <p style={{ margin: "24px 0 0", fontSize: 18, lineHeight: 1.62, fontWeight: 300, maxWidth: "52ch" }}>systems design engineering at waterloo, building computer-vision and machine-learning systems. off the clock i write, shoot 35mm, and keep a small notebook of verse.</p>
+            <div className="rh-div" style={{ marginTop: 28, height: 1 }} />
+          </header>
+
+          {/* 01 WORK */}
+          <section id="work" style={{ marginTop: 46, scrollMarginTop: 36 }}>
+            <SectionHead n="01" title="work" />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {work.map((w) => (
+                <a key={w.name} className="rh-row" href={w.href} target="_blank" rel="noopener noreferrer"
+                   style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "baseline", gap: 14, padding: "10px 0", margin: "0 -14px" }}>
+                  <span style={{ paddingLeft: 14, fontSize: 17 }}>{w.name}</span>
+                  <span className="rh-muted" style={{ flex: 1, fontSize: 14, fontWeight: 300, textAlign: "right", paddingRight: 14 }}>{w.note}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+
+          {/* 02 PROJECTS */}
+          <section id="projects" style={{ marginTop: 46, scrollMarginTop: 36 }}>
+            <SectionHead n="02" title="projects" />
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 16px", marginBottom: 6 }}>
+              {filterDefs.map((f) => (
+                <button key={f.key} type="button" onClick={() => setFilter(f.key)}
+                        className={filter === f.key ? "rh-clink" : "rh-clink rh-muted"}
+                        style={mono({ background: "none", border: 0, padding: "0 0 3px", cursor: "pointer", fontSize: 11.5, letterSpacing: "0.04em", color: filter === f.key ? "var(--text)" : undefined, borderBottom: `1px solid ${filter === f.key ? "currentColor" : "transparent"}` })}>
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", minHeight: 200 }}>
+              {projects.map((p) => (
+                <a key={p.name} className="rh-row rh-border" href={p.href} target="_blank" rel="noopener noreferrer"
+                   style={{ textDecoration: "none", color: "inherit", display: "grid", gridTemplateColumns: "120px 1fr", gap: 20, padding: "17px 0", margin: "0 -14px" }}>
+                  <span className="rh-muted" style={mono({ paddingLeft: 14, fontSize: 10.5, letterSpacing: "0.07em", lineHeight: 1.5, paddingTop: 4 })}>{p.tag}</span>
+                  <span style={{ paddingRight: 14 }}>
+                    <span style={{ display: "block", fontSize: 20, fontWeight: 400, letterSpacing: "-0.01em" }}>{p.name}</span>
+                    <span className="rh-muted" style={{ display: "block", marginTop: 7, fontSize: 15.5, lineHeight: 1.55, fontWeight: 300, maxWidth: "50ch" }}>{p.desc}</span>
+                  </span>
+                </a>
+              ))}
+            </div>
+          </section>
+
+          {/* 03 RESEARCH */}
+          <section id="research" style={{ marginTop: 46, scrollMarginTop: 36 }}>
+            <SectionHead n="03" title="research" />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {papers.map((r) => (
+                <a key={r.title} className="rh-row rh-border" href={r.href} target="_blank" rel="noopener noreferrer"
+                   style={{ textDecoration: "none", color: "inherit", display: "grid", gridTemplateColumns: "120px 1fr auto", gap: 20, padding: "17px 0", margin: "0 -14px" }}>
+                  <span className="rh-muted" style={mono({ paddingLeft: 14, fontSize: 10.5, letterSpacing: "0.07em", lineHeight: 1.5, paddingTop: 3 })}>{r.tag}</span>
+                  <span>
+                    <span style={{ display: "block", fontSize: 18, fontWeight: 400, letterSpacing: "-0.01em", lineHeight: 1.3 }}>{r.title}</span>
+                    <span className="rh-muted" style={{ display: "block", marginTop: 5, fontSize: 13.5, fontWeight: 300, fontStyle: "italic" }}>{r.venue}</span>
+                  </span>
+                  <span className="rh-muted" style={mono({ paddingRight: 14, alignSelf: "center", fontSize: 10.5, letterSpacing: "0.1em", textTransform: "uppercase" })}>{r.cta}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+
+          {/* 04 WRITING */}
+          <section id="writing" style={{ marginTop: 46, scrollMarginTop: 36 }}>
+            <SectionHead n="04" title="writing" />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {blogs.map((b) => (
+                <a key={b.name} className="rh-row rh-border" href={b.href}
+                   style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 18, padding: "13px 0", margin: "0 -14px" }}>
+                  <span style={{ paddingLeft: 14, fontSize: 18 }}>{b.name}</span>
+                  <span className="rh-muted" style={mono({ paddingRight: 14, fontSize: 10.5, letterSpacing: "0.07em" })}>{b.tag}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+
+          {/* 05 PASSIONS */}
+          <section id="passions" style={{ marginTop: 46, scrollMarginTop: 36 }}>
+            <SectionHead n="05" title="the fruits of my passions" />
+            <p style={{ margin: 0, fontSize: 18, fontWeight: 300, display: "flex", gap: 18, alignItems: "baseline" }}>
+              <a className="rh-ul" href="/poetry" style={{ textDecoration: "none", color: "inherit" }}>poetry</a>
+              <span className="rh-muted">/</span>
+              <a className="rh-ul" href="/photography" style={{ textDecoration: "none", color: "inherit" }}>photography</a>
+              <span className="rh-muted">/</span>
+              <a className="rh-ul" href="/free-verse" style={{ textDecoration: "none", color: "inherit" }}>free verse</a>
+            </p>
+          </section>
+
+          {/* 06 CONNECT */}
+          <section id="connect" style={{ marginTop: 46, scrollMarginTop: 36 }}>
+            <SectionHead n="06" title="connect" />
+            <p style={{ margin: "0 0 22px", fontSize: 25, fontWeight: 300, lineHeight: 1.35, maxWidth: "24ch" }}>
+              always glad to talk <span style={{ fontStyle: "italic" }}>models, code, or a good poem.</span>
+            </p>
+            <div style={{ display: "flex", gap: 24 }}>
+              <a className="rh-ul" style={mono({ fontSize: 13 })} href="mailto:rayyanshuda@gmail.com">email</a>
+              <a className="rh-ul" style={mono({ fontSize: 13 })} href="https://www.linkedin.com/in/rayyanhuda/" target="_blank" rel="noreferrer">linkedin</a>
+              <a className="rh-ul" style={mono({ fontSize: 13 })} href="https://x.com/rayyanshuda" target="_blank" rel="noreferrer">twitter</a>
+              <a className="rh-ul" style={mono({ fontSize: 13 })} href="https://github.com/rayyanshuda" target="_blank" rel="noreferrer">github</a>
+            </div>
+          </section>
+    </RhPageShell>
   );
 }
