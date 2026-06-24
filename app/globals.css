@@ -1276,9 +1276,25 @@ body:has(> .rh-page) {
 
 .rh-page.is-grid-painting {
   user-select: none;
+  touch-action: none;
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4' fill='rgba(255,90,25,0.55)'/%3E%3C/svg%3E")
       12 12,
     crosshair;
+}
+
+.rh-main {
+  user-select: text;
+  cursor: text;
+}
+
+.rh-main ::selection {
+  background: rgba(255, 120, 30, 0.45);
+  color: inherit;
+}
+
+.rh-main ::-moz-selection {
+  background: rgba(255, 120, 30, 0.45);
+  color: inherit;
 }
 
 .rh-grid-highlights {
@@ -1478,6 +1494,64 @@ body:has(> .rh-page) {
 }
 .rh-clink:hover {
   color: var(--text);
+}
+
+.rh-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  row-gap: 8px;
+  margin-bottom: 6px;
+}
+
+.rh-filter-item {
+  position: relative;
+  appearance: none;
+  font-family: "Spline Sans Mono", monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  padding: 0 0 3px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.18s ease;
+}
+
+.rh-filter-item::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transition: right 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.rh-filter-item:hover {
+  color: var(--text);
+}
+
+.rh-filter-item.is-active {
+  color: var(--text);
+}
+
+.rh-filter-item.is-active::after {
+  right: 0;
+}
+
+.rh-filter-sep {
+  flex: none;
+  padding: 0 1.15em;
+  font-family: "Spline Sans Mono", monospace;
+  font-size: 11.5px;
+  line-height: 1.2;
+  color: var(--muted);
+  user-select: none;
+  pointer-events: none;
 }
 
 .rh-ul {

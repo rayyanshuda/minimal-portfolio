@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import RhPageShell from "@/app/components/rh-page-shell";
 
 /* ------------------------------------------------------------------ *
@@ -22,8 +22,8 @@ const sectionNav = [
 const work = [
   { name: "CloudAct CPA", href: "https://cloudact.ca/", note: "testing and developing ai agents" },
   { name: "WAT.ai", href: "https://watai.ca/", note: "machine learning projects" },
-  { name: "github", href: "https://github.com/rayyanshuda", note: "miscellaneous coding projects" },
-  { name: "systems design engineering, uwaterloo", href: "https://uwaterloo.ca/systems-design-engineering/", note: "undergraduate studies" },
+  { name: "github", href: "https://github.com/rayyanshuda", note: "miscellaneous projects" },
+  { name: "systems design engineering @ uwaterloo", href: "https://uwaterloo.ca/systems-design-engineering/", note: "undergraduate studies" },
 ];
 
 const allProjects = [
@@ -33,10 +33,10 @@ const allProjects = [
 ];
 
 // TODO: replace these placeholders with your real papers + links.
-const papers = [
-  { tag: "computer vision",  title: "lightweight cnns for dermoscopic skin-lesion classification", venue: "undergraduate research · 2025", cta: "pdf", href: "#" },
-  { tag: "machine learning", title: "self-supervised pretraining for medical imaging",             venue: "in review",                   cta: "pdf", href: "#" },
-];
+// const papers = [
+//   { tag: "computer vision",  title: "lightweight cnns for dermoscopic skin-lesion classification", venue: "undergraduate research · 2025", cta: "pdf", href: "#" },
+//   { tag: "machine learning", title: "self-supervised pretraining for medical imaging",             venue: "in review",                   cta: "pdf", href: "#" },
+// ];
 
 const blogs = [
   { name: "my machine learning journey", tag: "essay", href: "/blog/my-machine-learning-journey" },
@@ -122,11 +122,11 @@ export default function Home() {
                 <div className="rh-muted" style={mono({ marginTop: 13, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase" })}>machine learning · computer vision · software</div>
               </div>
               <span className="rh-avatar" style={{ position: "relative", display: "inline-flex", alignItems: "center", flex: "none" }}>
-                <span className="rh-bubble" style={mono({ position: "absolute", right: "calc(100% + 12px)", top: "50%", whiteSpace: "nowrap", background: "var(--spotify-card-bg)", color: "var(--spotify-card-text)", fontSize: 10.5, letterSpacing: "0.04em", padding: "7px 10px", borderRadius: 2 })}>teaching machines to see ✶</span>
+                <span className="rh-bubble" style={mono({ position: "absolute", right: "calc(100% + 12px)", top: "50%", whiteSpace: "nowrap", background: "var(--spotify-card-bg)", color: "var(--spotify-card-text)", fontSize: 10.5, letterSpacing: "0.04em", padding: "7px 10px", borderRadius: 2 })}>draw on the side panels. graffiti my page ✶</span>
                 <img src="/hermes-statue.png" alt="rayyan huda" style={{ height: 66, width: "auto", display: "block", opacity: 0.92 }} />
               </span>
             </div>
-            <p style={{ margin: "24px 0 0", fontSize: 18, lineHeight: 1.62, fontWeight: 300, maxWidth: "52ch" }}>systems design engineering at waterloo, building computer-vision and machine-learning systems. off the clock i write, shoot 35mm, and keep a small notebook of verse.</p>
+            <p style={{ margin: "24px 0 0", fontSize: 18, lineHeight: 1.62, fontWeight: 300, maxWidth: "52ch" }}> systems design engineering at waterloo, building computer-vision and machine-learning systems. i write and take pictures sometimes.</p>
             <div className="rh-div" style={{ marginTop: 28, height: 1 }} />
           </header>
 
@@ -147,13 +147,23 @@ export default function Home() {
           {/* 02 PROJECTS */}
           <section id="projects" style={{ marginTop: 46, scrollMarginTop: 36 }}>
             <SectionHead n="02" title="projects" />
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 16px", marginBottom: 6 }}>
-              {filterDefs.map((f) => (
-                <button key={f.key} type="button" onClick={() => setFilter(f.key)}
-                        className={filter === f.key ? "rh-clink" : "rh-clink rh-muted"}
-                        style={mono({ background: "none", border: 0, padding: "0 0 3px", cursor: "pointer", fontSize: 11.5, letterSpacing: "0.04em", color: filter === f.key ? "var(--text)" : undefined, borderBottom: `1px solid ${filter === f.key ? "currentColor" : "transparent"}` })}>
-                  {f.label}
-                </button>
+            <div className="rh-filter-bar">
+              {filterDefs.map((f, i) => (
+                <Fragment key={f.key}>
+                  {i > 0 ? (
+                    <span className="rh-filter-sep" aria-hidden="true">
+                      {" · "}
+                    </span>
+                  ) : null}
+                  <button
+                    type="button"
+                    className={`rh-filter-item${filter === f.key ? " is-active" : ""}`}
+                    aria-pressed={filter === f.key}
+                    onClick={() => setFilter(f.key)}
+                  >
+                    {f.label}
+                  </button>
+                </Fragment>
               ))}
             </div>
             <div style={{ display: "flex", flexDirection: "column", minHeight: 200 }}>
@@ -173,7 +183,10 @@ export default function Home() {
           {/* 03 RESEARCH */}
           <section id="research" style={{ marginTop: 46, scrollMarginTop: 36 }}>
             <SectionHead n="03" title="research" />
-            <div style={{ display: "flex", flexDirection: "column" }}>
+            <p style={{ margin: 0, fontSize: 18, fontWeight: 300, lineHeight: 1.62, maxWidth: "52ch" }}>
+              the learning comes before the research. i&apos;m almost there.
+            </p>
+            {/* <div style={{ display: "flex", flexDirection: "column" }}>
               {papers.map((r) => (
                 <a key={r.title} className="rh-row rh-border" href={r.href} target="_blank" rel="noopener noreferrer"
                    style={{ textDecoration: "none", color: "inherit", display: "grid", gridTemplateColumns: "120px 1fr auto", gap: 20, padding: "17px 0", margin: "0 -14px" }}>
@@ -185,7 +198,7 @@ export default function Home() {
                   <span className="rh-muted" style={mono({ paddingRight: 14, alignSelf: "center", fontSize: 10.5, letterSpacing: "0.1em", textTransform: "uppercase" })}>{r.cta}</span>
                 </a>
               ))}
-            </div>
+            </div> */}
           </section>
 
           {/* 04 WRITING */}

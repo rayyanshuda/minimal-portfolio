@@ -5,20 +5,11 @@ import MobileContentsDrawer from "@/app/components/mobile-contents-drawer";
 import MobileThemeToggle from "@/app/components/mobile-theme-toggle";
 import OverflowMarquee from "@/app/components/overflow-marquee";
 import { SPOTIFY_PROFILE_URL } from "@/app/lib/spotify-constants";
+import { useSpotifyWidget, type SpotifyWidgetData } from "@/app/lib/spotify-widget-store";
+
+export type { SpotifyWidgetData };
 
 export type Theme = "midnight" | "snow" | "coffee-cream" | "dusty-blue";
-
-export type SpotifyWidgetData = {
-  isPlaying: boolean;
-  title: string;
-  artist: string;
-  songUrl: string;
-  albumImageUrl: string;
-  profileName: string;
-  profileUsername: string;
-  profileImageUrl: string;
-  profileUrl: string;
-};
 
 export type RhContentsItem = {
   id: string;
@@ -33,44 +24,121 @@ type PaintDab = { x: number; y: number; r: number };
 
 const GRID_PAINT_DRAG_THRESHOLD = 4;
 const BRUSH_RADIUS = 12;
-const BRUSH_SPACING = 6;
-const INTERACTIVE_SELECTOR =
-  "a, button, input, textarea, select, label, [role='button'], .mobile-contents-toggle, .mobile-contents-drawer, .mobile-contents-overlay, .mobile-theme-toggle, .mobile-theme-overlay, .mobile-theme-close, .theme-nav";
+const BRUSH_SPACING = 4;
+const MOBILE_UI_SELECTOR =
+  ".mobile-contents-toggle, .mobile-contents-drawer, .mobile-contents-overlay, .mobile-theme-toggle, .mobile-theme-overlay, .mobile-theme-close";
+
+function isInteractiveTarget(target: EventTarget | null) {
+  if (!(target instanceof Element)) return false;
+  return !!target.closest("a, button, input, textarea, select, label, [role='button']");
+}
+
+function isInSidebarColumn(clientX: number, pageEl: HTMLElement) {
+  const main = pageEl.querySelector(".rh-main");
+  if (!(main instanceof HTMLElement)) return false;
+  const mainR = main.getBoundingClientRect();
+  return clientX < mainR.left || clientX > mainR.right;
+}
+
+function isInMainColumn(clientX: number, pageEl: HTMLElement) {
+  const main = pageEl.querySelector(".rh-main");
+  if (!(main instanceof HTMLElement)) return false;
+  const r = main.getBoundingClientRect();
+  return clientX >= r.left && clientX <= r.right;
+}
 
 function clientToDoc(clientX: number, clientY: number) {
   return { x: clientX + window.scrollX, y: clientY + window.scrollY };
 }
 
-function dabsAlongLine(x0: number, y0: number, x1: number, y1: number, r: number): PaintDab[] {
-  const dabs: PaintDab[] = [];
-  const dx = x1 - x0;
-  const dy = y1 - y0;
-  const dist = Math.hypot(dx, dy);
-  if (dist < BRUSH_SPACING) {
-    dabs.push({ x: x1, y: y1, r });
-    return dabs;
+function appendDabs(container: HTMLElement, points: PaintDab[]) {
+  if (!points.length) return;
+  const fragment = document.createDocumentFragment();
+  for (const { x, y, r } of points) {
+    const dab = document.createElement("div");
+    dab.className = "rh-grid-brush-dab";
+    dab.style.left = `${x - r}px`;
+    dab.style.top = `${y - r}px`;
+    dab.style.width = `${r * 2}px`;
+    dab.style.height = `${r * 2}px`;
+    fragment.appendChild(dab);
   }
-  const steps = Math.ceil(dist / BRUSH_SPACING);
+  container.appendChild(fragment);
+}
+
+function dabsAlongSegment(docX0: number, docY0: number, docX1: number, docY1: number): PaintDab[] {
+  const dx = docX1 - docX0;
+  const dy = docY1 - docY0;
+  const dist = Math.hypot(dx, dy);
+  if (dist === 0) return [{ x: docX1, y: docY1, r: BRUSH_RADIUS }];
+
+  const steps = Math.max(1, Math.ceil(dist / BRUSH_SPACING));
+  const dabs: PaintDab[] = [];
   for (let i = 1; i <= steps; i++) {
     const t = i / steps;
-    dabs.push({ x: x0 + dx * t, y: y0 + dy * t, r });
+    dabs.push({ x: docX0 + dx * t, y: docY0 + dy * t, r: BRUSH_RADIUS });
   }
   return dabs;
 }
 
-function appendDab(container: HTMLElement, { x, y, r }: PaintDab) {
-  const dab = document.createElement("div");
-  dab.className = "rh-grid-brush-dab";
-  dab.style.left = `${x - r}px`;
-  dab.style.top = `${y - r}px`;
-  dab.style.width = `${r * 2}px`;
-  dab.style.height = `${r * 2}px`;
-  container.appendChild(dab);
+function addDabsAlongLine(
+  docX0: number,
+  docY0: number,
+  docX1: number,
+  docY1: number,
+  addDabs: (points: PaintDab[]) => void,
+) {
+  addDabs(dabsAlongSegment(docX0, docY0, docX1, docY1));
 }
 
-function isGridPaintTarget(target: EventTarget | null) {
-  if (!(target instanceof Element)) return false;
-  return !target.closest(INTERACTIVE_SELECTOR);
+type CaretDocument = Document & {
+  caretRangeFromPoint?: (x: number, y: number) => Range | null;
+  caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null;
+};
+
+function getTextNodeAtPoint(clientX: number, clientY: number): Text | null {
+  const doc = document as CaretDocument;
+
+  if (doc.caretRangeFromPoint) {
+    const caret = doc.caretRangeFromPoint(clientX, clientY);
+    if (!caret || caret.startContainer.nodeType !== Node.TEXT_NODE) return null;
+    return caret.startContainer as Text;
+  }
+
+  if (doc.caretPositionFromPoint) {
+    const caret = doc.caretPositionFromPoint(clientX, clientY);
+    if (!caret || caret.offsetNode.nodeType !== Node.TEXT_NODE) return null;
+    return caret.offsetNode as Text;
+  }
+
+  return null;
+}
+
+function hasSidebarTextAtPoint(clientX: number, clientY: number) {
+  const textNode = getTextNodeAtPoint(clientX, clientY);
+  if (!textNode) return false;
+
+  const parent = textNode.parentElement;
+  if (!parent?.closest(".rh-aside-panel, .theme-nav")) return false;
+
+  const range = document.createRange();
+  range.selectNodeContents(textNode);
+  for (const rect of range.getClientRects()) {
+    if (clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isMainTextAtPoint(clientX: number, clientY: number) {
+  const textNode = getTextNodeAtPoint(clientX, clientY);
+  if (!textNode) return false;
+
+  const parent = textNode.parentElement;
+  if (!parent?.closest(".rh-main")) return false;
+  if (isInteractiveTarget(textNode)) return false;
+  return true;
 }
 
 type RhPageShellProps = {
@@ -82,15 +150,17 @@ type RhPageShellProps = {
 export default function RhPageShell({ children, contentsItems, activeContentId }: RhPageShellProps) {
   const [theme, setTheme] = useState<Theme>("coffee-cream");
   const [isThemeReady, setIsThemeReady] = useState(false);
-  const [spotifyData, setSpotifyData] = useState<SpotifyWidgetData | null>(null);
-  const [spotifyError, setSpotifyError] = useState("");
+  const { data: spotifyData, error: spotifyError } = useSpotifyWidget();
   const [isGridPainting, setIsGridPainting] = useState(false);
 
   const pageRef = useRef<HTMLDivElement | null>(null);
   const highlightsRef = useRef<HTMLDivElement | null>(null);
   const paintRef = useRef({
     active: false,
+    mode: null as "grid" | "text" | null,
     moved: false,
+    sidebarPressed: false,
+    pointerId: null as number | null,
     startX: 0,
     startY: 0,
     lastX: null as number | null,
@@ -120,62 +190,167 @@ export default function RhPageShell({ children, contentsItems, activeContentId }
     const pageEl = pageRef.current;
     if (!pageEl) return;
 
-    const clearPaint = () => {
+    pageEl.querySelectorAll("mark.rh-word-highlight").forEach((mark) => {
+      mark.replaceWith(...mark.childNodes);
+    });
+
+    const clearGridPaint = () => {
       highlightsRef.current?.replaceChildren();
     };
 
-    const addDabs = (points: PaintDab[]) => {
+    const addDabsToCanvas = (points: PaintDab[]) => {
       const container = highlightsRef.current;
       if (!container || !points.length) return;
-      for (const point of points) appendDab(container, point);
+      appendDabs(container, points);
     };
 
-    const onMouseDown = (e: MouseEvent) => {
-      if (e.button !== 0) return;
-      if (!isGridPaintTarget(e.target)) {
-        clearPaint();
-        return;
+    const releasePointer = (pointerId: number | null) => {
+      if (pointerId === null) return;
+      if (pageEl.hasPointerCapture(pointerId)) {
+        pageEl.releasePointerCapture(pointerId);
       }
+    };
 
+    const beginGridPaint = (e: PointerEvent) => {
       e.preventDefault();
+      window.getSelection()?.removeAllRanges();
+
+      const pressX = paintRef.current.startX;
+      const pressY = paintRef.current.startY;
+      const pressDoc = clientToDoc(pressX, pressY);
       const { x, y } = clientToDoc(e.clientX, e.clientY);
+      const moved = Math.hypot(e.clientX - pressX, e.clientY - pressY) > GRID_PAINT_DRAG_THRESHOLD;
+
       paintRef.current = {
         active: true,
-        moved: false,
-        startX: e.clientX,
-        startY: e.clientY,
-        lastX: x,
-        lastY: y,
+        mode: "grid",
+        moved,
+        sidebarPressed: false,
+        pointerId: e.pointerId,
+        startX: pressX,
+        startY: pressY,
+        lastX: pressDoc.x,
+        lastY: pressDoc.y,
       };
+
+      pageEl.setPointerCapture(e.pointerId);
       setIsGridPainting(true);
-      addDabs([{ x, y, r: BRUSH_RADIUS }]);
+      addDabsToCanvas([{ x: pressDoc.x, y: pressDoc.y, r: BRUSH_RADIUS }]);
+      if (pressDoc.x !== x || pressDoc.y !== y) {
+        addDabsAlongLine(pressDoc.x, pressDoc.y, x, y, addDabsToCanvas);
+      }
+      paintRef.current.lastX = x;
+      paintRef.current.lastY = y;
     };
 
-    const onMouseMove = (e: MouseEvent) => {
+    const paintTo = (clientX: number, clientY: number) => {
       const paint = paintRef.current;
-      if (!paint.active) return;
+      const { x, y } = clientToDoc(clientX, clientY);
 
-      if (Math.hypot(e.clientX - paint.startX, e.clientY - paint.startY) > GRID_PAINT_DRAG_THRESHOLD) {
-        paint.moved = true;
-      }
-
-      const { x, y } = clientToDoc(e.clientX, e.clientY);
       if (paint.lastX !== null && paint.lastY !== null) {
-        addDabs(dabsAlongLine(paint.lastX, paint.lastY, x, y, BRUSH_RADIUS));
+        addDabsAlongLine(paint.lastX, paint.lastY, x, y, addDabsToCanvas);
       } else {
-        addDabs([{ x, y, r: BRUSH_RADIUS }]);
+        addDabsToCanvas([{ x, y, r: BRUSH_RADIUS }]);
       }
+
       paint.lastX = x;
       paint.lastY = y;
     };
 
-    const endPaint = () => {
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.button !== 0) return;
+
+      const target = e.target;
+      if (target instanceof Element && target.closest(MOBILE_UI_SELECTOR)) {
+        clearGridPaint();
+        return;
+      }
+
+      const inMain = isInMainColumn(e.clientX, pageEl);
+      const inSidebar = isInSidebarColumn(e.clientX, pageEl);
+
+      if (inMain) {
+        paintRef.current.sidebarPressed = false;
+        if (isMainTextAtPoint(e.clientX, e.clientY)) {
+          clearGridPaint();
+          paintRef.current = {
+            active: true,
+            mode: "text",
+            moved: false,
+            sidebarPressed: false,
+            pointerId: null,
+            startX: e.clientX,
+            startY: e.clientY,
+            lastX: null,
+            lastY: null,
+          };
+          return;
+        }
+        return;
+      }
+
+      if (!inSidebar) return;
+
+      paintRef.current.sidebarPressed = true;
+      paintRef.current.startX = e.clientX;
+      paintRef.current.startY = e.clientY;
+
+      if (hasSidebarTextAtPoint(e.clientX, e.clientY)) return;
+
+      beginGridPaint(e);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
       const paint = paintRef.current;
-      if (!paint.active) return;
-      if (!paint.moved) clearPaint();
+
+      if (!paint.active || paint.mode !== "grid") {
+        if (e.buttons !== 1 || !paint.sidebarPressed) return;
+        if (hasSidebarTextAtPoint(e.clientX, e.clientY)) return;
+        if (Math.hypot(e.clientX - paint.startX, e.clientY - paint.startY) < GRID_PAINT_DRAG_THRESHOLD) return;
+        beginGridPaint(e);
+        return;
+      }
+
+      if (paint.pointerId !== null && e.pointerId !== paint.pointerId) return;
+
+      if (Math.hypot(e.clientX - paint.startX, e.clientY - paint.startY) > GRID_PAINT_DRAG_THRESHOLD) {
+        paint.moved = true;
+        window.getSelection()?.removeAllRanges();
+      }
+
+      e.preventDefault();
+
+      const moves =
+        typeof e.getCoalescedEvents === "function" ? e.getCoalescedEvents() : [e];
+      for (const move of moves) {
+        paintTo(move.clientX, move.clientY);
+      }
+    };
+
+    const endPaint = (e: PointerEvent) => {
+      const paint = paintRef.current;
+      if (!paint.active && !paint.sidebarPressed) return;
+      if (
+        paint.active &&
+        paint.mode === "grid" &&
+        paint.pointerId !== null &&
+        e.pointerId !== paint.pointerId
+      ) {
+        return;
+      }
+
+      releasePointer(paint.pointerId);
+
+      if (paint.active && paint.mode === "grid" && !paint.moved) {
+        clearGridPaint();
+      }
+
       paintRef.current = {
         active: false,
+        mode: null,
         moved: false,
+        sidebarPressed: false,
+        pointerId: null,
         startX: 0,
         startY: 0,
         lastX: null,
@@ -184,61 +359,15 @@ export default function RhPageShell({ children, contentsItems, activeContentId }
       setIsGridPainting(false);
     };
 
-    pageEl.addEventListener("mousedown", onMouseDown);
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", endPaint);
+    document.addEventListener("pointerdown", onPointerDown, true);
+    pageEl.addEventListener("pointermove", onPointerMove, { passive: false });
+    document.addEventListener("pointerup", endPaint, true);
+    document.addEventListener("pointercancel", endPaint, true);
     return () => {
-      pageEl.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", endPaint);
-    };
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadSpotify = async (attempt = 0): Promise<void> => {
-      const controller = new AbortController();
-      const timeoutId = window.setTimeout(() => controller.abort(), 12000);
-
-      try {
-        const res = await fetch("/api/spotify", { cache: "no-store", signal: controller.signal });
-        if (!res.ok) {
-          const errorJson = (await res.json().catch(() => ({}))) as { message?: string };
-          throw new Error(errorJson.message ?? "Failed to load Spotify track.");
-        }
-
-        const data = (await res.json()) as SpotifyWidgetData;
-        if (!mounted) return;
-
-        setSpotifyData(data);
-        setSpotifyError("");
-      } catch (e) {
-        if (!mounted) return;
-
-        if (attempt < 1) {
-          await new Promise((resolve) => window.setTimeout(resolve, 800));
-          if (!mounted) return;
-          return loadSpotify(attempt + 1);
-        }
-
-        const message =
-          e instanceof Error && e.name === "AbortError"
-            ? "Spotify widget timed out."
-            : e instanceof Error
-              ? e.message
-              : "Spotify widget unavailable.";
-        setSpotifyError(message);
-      } finally {
-        window.clearTimeout(timeoutId);
-      }
-    };
-
-    void loadSpotify();
-    const id = window.setInterval(() => void loadSpotify(), 30000);
-    return () => {
-      mounted = false;
-      window.clearInterval(id);
+      document.removeEventListener("pointerdown", onPointerDown, true);
+      pageEl.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerup", endPaint, true);
+      document.removeEventListener("pointercancel", endPaint, true);
     };
   }, []);
 
