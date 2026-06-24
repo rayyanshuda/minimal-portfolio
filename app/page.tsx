@@ -9,6 +9,7 @@ import RhPageShell from "@/app/components/rh-page-shell";
 
 type Filter = "all" | "cv" | "ml" | "swe";
 
+
 const sectionNav = [
   { id: "work", label: "work" },
   { id: "projects", label: "projects" },
