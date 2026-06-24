@@ -26,7 +26,6 @@ type Snapshot = {
 let cachedData: SpotifyWidgetData | null = null;
 let cachedError = "";
 let listeners = new Set<() => void>();
-let pollIntervalId: ReturnType<typeof setInterval> | null = null;
 let fetchInFlight: Promise<void> | null = null;
 let pollingStarted = false;
 
@@ -59,7 +58,9 @@ function getSnapshot(): Snapshot {
 
 export function subscribeSpotify(listener: () => void) {
   listeners.add(listener);
-  return () => listeners.delete(listener);
+  return () => {
+    listeners.delete(listener);
+  };
 }
 
 async function loadSpotify(silent: boolean, attempt = 0): Promise<void> {
@@ -114,7 +115,7 @@ function startPolling() {
   if (!cachedData) cachedData = readSession();
   void requestLoad(Boolean(cachedData));
 
-  pollIntervalId = window.setInterval(() => {
+  window.setInterval(() => {
     if (document.visibilityState === "visible") {
       void requestLoad(true);
     }
