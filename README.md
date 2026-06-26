@@ -3,7 +3,7 @@
 
 i like minimal aesthetics. not because it's trendy, but because i like conveying an idea with only what it needs. nothing more. you strip away the noise and what's left is either something real or nothing at all.
 
-my design follows that same logic.
+my design follows that same logic (almost, i still added some extra cool features)
 
 also the lowercase theme is a creative choice, not a recurring grammar mistake.
 
