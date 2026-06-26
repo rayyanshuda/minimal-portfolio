@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useState } from "react";
 import RhPageShell from "@/app/components/rh-page-shell";
+import RhSiteHeader from "@/app/components/rh-site-header";
 
 /* ------------------------------------------------------------------ *
  *  TYPES + DATA
@@ -115,22 +116,18 @@ export default function Home() {
         onSelect: () => scrollToSection(s.id),
       }))}
     >
-          <header>
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 20 }}>
-              <div>
-                <h1 style={{ margin: 0, fontSize: 46, fontWeight: 400, lineHeight: 1, letterSpacing: "-0.015em" }}>rayyan huda</h1>
-                <div className="rh-muted" style={mono({ marginTop: 13, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase" })}>machine learning · computer vision · software</div>
-              </div>
-              <span className="rh-avatar" style={{ position: "relative", display: "inline-flex", alignItems: "center", flex: "none" }}>
-                <span className="rh-bubble" style={mono({ position: "absolute", right: "calc(100% + 12px)", top: "50%", whiteSpace: "nowrap", background: "var(--spotify-card-bg)", color: "var(--spotify-card-text)", fontSize: 10.5, letterSpacing: "0.04em", padding: "7px 10px", borderRadius: 2 })}>draw on the side panels. graffiti my page ✶</span>
-                <img src="/hermes-statue.png" alt="rayyan huda" style={{ height: 66, width: "auto", display: "block", opacity: 0.92 }} />
-              </span>
-            </div>
-            <p style={{ margin: "24px 0 0", fontSize: 18, lineHeight: 1.62, fontWeight: 300, maxWidth: "52ch" }}> systems design engineering at waterloo, building computer-vision and machine-learning systems. i write and take pictures sometimes.</p>
-            <div className="rh-div" style={{ marginTop: 28, height: 1 }} />
-          </header>
+      <RhSiteHeader
+        title="rayyan huda"
+        subtitle="machine learning · computer vision · software"
+        bubbleText="draw on the side panels. graffiti my page ✶"
+        lede={
+          <p className="rh-site-header__lede">
+            systems design engineering at waterloo, building computer-vision and machine-learning systems. i write and take pictures sometimes.
+          </p>
+        }
+      />
 
-          {/* 01 WORK */}
+      {/* 01 WORK */}
           <section id="work" style={{ marginTop: 46, scrollMarginTop: 36 }}>
             <SectionHead n="01" title="work" />
             <div style={{ display: "flex", flexDirection: "column" }}>
