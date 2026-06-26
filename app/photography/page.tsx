@@ -30,8 +30,8 @@ const photoCards: PhotoCard[] = [
   },
   {
     id: "photo-29",
-    src: "/photographs_pics/pakistan2.jpg",
-    alt: "Forest greenery photo",
+    src: "/photographs_pics/pakistan2.JPG",
+    alt: "sunset in karachi",
     caption: "my first sunset in karachi captured",
     date: "November 15th, 2025",
   },
