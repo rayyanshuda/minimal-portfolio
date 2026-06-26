@@ -1,9 +1,11 @@
 # rayyan huda
 
 
-i'm drawn to minimal aesthetics. not because it's trendy, but because there's something honest about conveying an idea with only what it needs. nothing more. you strip away the noise and what's left is either something real or nothing at all.
+i like minimal aesthetics. not because it's trendy, but because i like conveying an idea with only what it needs. nothing more. you strip away the noise and what's left is either something real or nothing at all.
 
 my design follows that same logic.
+
+also the lowercase theme is a creative choice, not a recurring grammar mistake.
 
 
 ## what you'll find here
@@ -13,7 +15,7 @@ if you want answers, you have to be willing to look for it. go explore.
 
 ## art
 
-I've fallen in love with countless forms of art, and although I am far from being considered as an artist, I love dipping my toes in each and every water, to find new passions. 
+I've fallen in love with countless forms of art, and although I am far from being considered as an artist, I love dipping my toes in different waters, to find new passions. 
 
 a lot of people have a lot of definitions. mine is simple:
 
