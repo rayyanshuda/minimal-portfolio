@@ -934,6 +934,70 @@ body:has(> .rh-page) {
   opacity: 0.8;
 }
 
+.rh-blog-body {
+  margin: 0;
+  font-size: var(--body-size);
+  line-height: var(--body-line-height);
+  font-weight: inherit;
+  color: inherit;
+}
+
+.rh-blog-body .rh-blog-paragraph {
+  margin: 0 0 1rem;
+}
+
+.rh-blog-body .rh-blog-heading {
+  margin: 1.6rem 0 0.6rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: inherit;
+}
+
+.rh-blog-body .rh-blog-heading--h1 {
+  font-size: 1.5rem;
+}
+
+.rh-blog-body .rh-blog-heading--h2 {
+  font-size: 1.3rem;
+}
+
+.rh-blog-body .rh-blog-heading--h3 {
+  font-size: 1.15rem;
+}
+
+.rh-blog-body .rh-blog-heading--h4,
+.rh-blog-body .rh-blog-heading--h5,
+.rh-blog-body .rh-blog-heading--h6 {
+  font-size: 1rem;
+}
+
+.rh-blog-body .rh-poem-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.rh-blog-body .rh-poem-link:hover {
+  opacity: 0.8;
+}
+
+.rh-blog-body .rh-blog-list {
+  margin: 0 0 1rem;
+  padding-inline-start: 1.4rem;
+}
+
+.rh-blog-body .rh-blog-list li {
+  margin: 0 0 0.4rem;
+}
+
+.rh-blog-body .rh-blog-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+  border-radius: 4px;
+}
+
 .rh-poem-blackout-scroll {
   container-type: inline-size;
   width: 100%;
