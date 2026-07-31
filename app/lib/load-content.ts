@@ -33,7 +33,6 @@ function parseContentFile(filePath: string): ContentPiece {
     order: typeof data.order === "number" ? data.order : undefined,
     spacing,
     className: typeof data.className === "string" ? data.className : undefined,
-    tag: typeof data.tag === "string" ? data.tag : undefined,
   };
 }
 

@@ -8,5 +8,4 @@ export type ContentPiece = {
   order?: number;
   spacing?: ContentSpacing;
   className?: string;
-  tag?: string;
 };

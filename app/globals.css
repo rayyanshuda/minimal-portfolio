@@ -946,6 +946,10 @@ body:has(> .rh-page) {
   margin: 0 0 1rem;
 }
 
+.rh-blog-body strong {
+  font-weight: 600;
+}
+
 .rh-blog-body .rh-blog-heading {
   margin: 1.6rem 0 0.6rem;
   font-weight: 500;
@@ -984,13 +988,59 @@ body:has(> .rh-page) {
 .rh-blog-body .rh-blog-list {
   margin: 0 0 1rem;
   padding-inline-start: 1.4rem;
+  color: var(--muted);
 }
 
 .rh-blog-body .rh-blog-list li {
   margin: 0 0 0.4rem;
 }
 
+.rh-blog-body .rh-blog-blockquote {
+  margin: 0 0 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--muted);
+  color: var(--muted);
+  font-style: italic;
+}
+
+.rh-blog-body .rh-blog-hr {
+  margin: 2rem 0;
+  border: none;
+  border-top: 1px solid var(--muted);
+  opacity: 0.4;
+}
+
+.rh-blog-body .rh-blog-table-scroll {
+  overflow-x: auto;
+  margin: 0 0 1.4rem;
+}
+
+.rh-blog-body .rh-blog-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.95em;
+}
+
+.rh-blog-body .rh-blog-table th,
+.rh-blog-body .rh-blog-table td {
+  border: 1px solid var(--muted);
+  padding: 0.4rem 0.7rem;
+  text-align: left;
+}
+
+.rh-blog-body .rh-blog-table th {
+  font-weight: 500;
+}
+
 .rh-blog-body .rh-blog-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+  border-radius: 4px;
+}
+
+.rh-blog-body .rh-blog-video {
   display: block;
   max-width: 100%;
   height: auto;

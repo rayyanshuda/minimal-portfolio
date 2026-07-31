@@ -5,6 +5,14 @@ const HEADER_LINE = /^(#{1,6})\s+(.+)$/;
 const IMAGE_LINE = /^!\[([^\]]*)\]\(([^)]+)\)$/;
 const UL_ITEM = /^[-*]\s+(.+)$/;
 const OL_ITEM = /^\d+\.\s+(.+)$/;
+const HR_LINE = /^(-{3,}|\*{3,}|_{3,})$/;
+const BLOCKQUOTE_LINE = /^>\s?(.*)$/;
+const VIDEO_BLOCK_START = /^<video\b/i;
+const VIDEO_BLOCK_END = /<\/video>$/i;
+const VIDEO_WIDTH_ATTR = /^<video\b[^>]*\swidth="(\d+)"/i;
+const VIDEO_SOURCE_TAG = /<source\b[^>]*>/i;
+const SRC_ATTR = /\bsrc="([^"]+)"/i;
+const TYPE_ATTR = /\btype="([^"]+)"/i;
 
 function splitBlocks(body: string): string[][] {
   const blocks: string[][] = [];
@@ -24,6 +32,18 @@ function splitBlocks(body: string): string[][] {
 
   if (current.length > 0) blocks.push(current);
   return blocks;
+}
+
+function splitTableRow(line: string): string[] {
+  let trimmed = line.trim();
+  if (trimmed.startsWith("|")) trimmed = trimmed.slice(1);
+  if (trimmed.endsWith("|")) trimmed = trimmed.slice(0, -1);
+  return trimmed.split("|").map((cell) => cell.trim());
+}
+
+function isTableSeparatorRow(line: string): boolean {
+  const cells = splitTableRow(line);
+  return cells.length > 0 && cells.every((cell) => /^:?-+:?$/.test(cell));
 }
 
 function renderHeading(level: number, text: string, key: string): ReactNode {
@@ -57,6 +77,62 @@ function renderList(items: string[], ordered: boolean, key: string): ReactNode {
   );
 }
 
+function renderVideo(lines: string[], key: string): ReactNode | null {
+  const joined = lines.join(" ");
+  const sourceTagMatch = joined.match(VIDEO_SOURCE_TAG);
+  if (!sourceTagMatch) return null;
+
+  const srcMatch = sourceTagMatch[0].match(SRC_ATTR);
+  if (!srcMatch) return null;
+
+  const src = srcMatch[1].trim();
+  if (!isSafeHref(src)) return null;
+
+  const type = sourceTagMatch[0].match(TYPE_ATTR)?.[1];
+  const widthMatch = joined.match(VIDEO_WIDTH_ATTR);
+
+  return (
+    <video
+      key={key}
+      className="rh-blog-video"
+      controls
+      width={widthMatch ? Number(widthMatch[1]) : undefined}
+    >
+      <source src={src} type={type} />
+    </video>
+  );
+}
+
+function renderTable(lines: string[], key: string): ReactNode {
+  const headerCells = splitTableRow(lines[0]);
+  const bodyRows = lines.slice(2).map((line) => splitTableRow(line));
+
+  return (
+    <div key={key} className="rh-blog-table-scroll">
+      <table className="rh-blog-table">
+        <thead>
+          <tr>
+            {headerCells.map((cell, index) => (
+              <th key={`${key}-h${index}`}>{parseInlineMarkdown(cell, `${key}-h${index}-`)}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {bodyRows.map((row, rowIndex) => (
+            <tr key={`${key}-r${rowIndex}`}>
+              {row.map((cell, cellIndex) => (
+                <td key={`${key}-r${rowIndex}-c${cellIndex}`}>
+                  {parseInlineMarkdown(cell, `${key}-r${rowIndex}-c${cellIndex}-`)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export function renderBlogMarkdown(body: string): ReactNode {
   const blocks = splitBlocks(body);
 
@@ -64,6 +140,10 @@ export function renderBlogMarkdown(body: string): ReactNode {
     const key = `b${index}`;
 
     if (lines.length === 1) {
+      if (HR_LINE.test(lines[0])) {
+        return <hr key={key} className="rh-blog-hr" />;
+      }
+
       const headerMatch = lines[0].match(HEADER_LINE);
       if (headerMatch) {
         return renderHeading(headerMatch[1].length, headerMatch[2], key);
@@ -79,6 +159,15 @@ export function renderBlogMarkdown(body: string): ReactNode {
       }
     }
 
+    if (lines.length >= 2 && lines[0].includes("|") && isTableSeparatorRow(lines[1])) {
+      return renderTable(lines, key);
+    }
+
+    if (VIDEO_BLOCK_START.test(lines[0]) && VIDEO_BLOCK_END.test(lines[lines.length - 1])) {
+      const video = renderVideo(lines, key);
+      if (video) return video;
+    }
+
     if (lines.every((line) => UL_ITEM.test(line))) {
       const items = lines.map((line) => line.match(UL_ITEM)![1]);
       return renderList(items, false, key);
@@ -87,6 +176,15 @@ export function renderBlogMarkdown(body: string): ReactNode {
     if (lines.every((line) => OL_ITEM.test(line))) {
       const items = lines.map((line) => line.match(OL_ITEM)![1]);
       return renderList(items, true, key);
+    }
+
+    if (lines.every((line) => BLOCKQUOTE_LINE.test(line))) {
+      const inner = lines.map((line) => line.match(BLOCKQUOTE_LINE)![1]).join(" ");
+      return (
+        <blockquote key={key} className="rh-blog-blockquote">
+          {parseInlineMarkdown(inner, `${key}-`)}
+        </blockquote>
+      );
     }
 
     return (
