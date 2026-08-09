@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useEffect, useRef } from "react";
 
 type MobileContentsItem = {
   id: string;
-  label: string;
+  label: ReactNode;
   href?: string;
   onSelect?: () => void;
 };

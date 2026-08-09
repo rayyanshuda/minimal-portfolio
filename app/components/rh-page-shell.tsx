@@ -13,7 +13,7 @@ export type Theme = "midnight" | "snow" | "coffee-cream" | "dusty-blue";
 
 export type RhContentsItem = {
   id: string;
-  label: string;
+  label: ReactNode;
   href?: string;
   onSelect?: () => void;
 };

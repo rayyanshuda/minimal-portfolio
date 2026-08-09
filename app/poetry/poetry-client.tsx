@@ -19,9 +19,14 @@ export default function PoetryClient({ poems }: PoetryClientProps) {
   return (
     <RhPageShell
       activeContentId={activePoemId || "poetry"}
-      contentsItems={poems.map((poem) => ({
+      contentsItems={poems.map((poem, index) => ({
         id: poem.id,
-        label: poem.title,
+        label: (
+          <>
+            <span className="rh-clink-num">{String(index + 1).padStart(2, "0")}</span>
+            {poem.title}
+          </>
+        ),
         onSelect: () => setActivePoemId(poem.id),
       }))}
     >

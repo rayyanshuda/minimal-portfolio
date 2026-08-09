@@ -273,7 +273,17 @@ export default function PhotographyPage() {
     <RhPageShell
       activeContentId="photography"
       contentsItems={[
-        { id: "photography", label: "photography", href: "#photography", onSelect: scrollToPhotographySection },
+        {
+          id: "photography",
+          label: (
+            <>
+              <span className="rh-clink-num">01</span>
+              photography
+            </>
+          ),
+          href: "#photography",
+          onSelect: scrollToPhotographySection,
+        },
       ]}
     >
       <RhSubpageHeader title="photography" caption="click on the pictures to know about them" />

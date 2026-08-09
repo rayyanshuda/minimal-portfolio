@@ -317,9 +317,14 @@ export default function ThreeDModellingBlogPage() {
   return (
     <RhPageShell
       activeContentId={activeSection}
-      contentsItems={sectionNav.map((section) => ({
+      contentsItems={sectionNav.map((section, index) => ({
         id: section.id,
-        label: section.label,
+        label: (
+          <>
+            <span className="rh-clink-num">{String(index + 1).padStart(2, "0")}</span>
+            {section.label}
+          </>
+        ),
         href: `#${section.id}`,
         onSelect: () => scrollToSection(section.id),
       }))}

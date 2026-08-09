@@ -1346,6 +1346,11 @@ body:has(> .rh-page) {
     margin-top: 16px;
   }
 
+  .mobile-contents-drawer .rh-clink-num {
+    width: 16px;
+    margin-left: -16px;
+  }
+
   .theme-nav {
     display: block;
     position: fixed;
@@ -1680,6 +1685,15 @@ body:has(> .rh-page) {
 
 .rh-aside-link.is-active {
   color: var(--text);
+}
+
+.rh-clink-num {
+  display: inline-block;
+  width: 28px;
+  margin-left: -28px;
+  text-align: left;
+  font-family: "Spline Sans Mono", monospace;
+  font-size: 11px;
 }
 
 .rh-aside-loading {

@@ -19,9 +19,14 @@ export default function FreeVerseClient({ verses }: FreeVerseClientProps) {
   return (
     <RhPageShell
       activeContentId={activeVerseId || "free-verse"}
-      contentsItems={verses.map((verse) => ({
+      contentsItems={verses.map((verse, index) => ({
         id: verse.id,
-        label: verse.title,
+        label: (
+          <>
+            <span className="rh-clink-num">{String(index + 1).padStart(2, "0")}</span>
+            {verse.title}
+          </>
+        ),
         onSelect: () => setActiveVerseId(verse.id),
       }))}
     >

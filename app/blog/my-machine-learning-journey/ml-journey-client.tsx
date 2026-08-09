@@ -19,9 +19,14 @@ export default function MlJourneyClient({ pieces }: MlJourneyClientProps) {
   return (
     <RhPageShell
       activeContentId={activePieceId || "ml-journey"}
-      contentsItems={pieces.map((piece) => ({
+      contentsItems={pieces.map((piece, index) => ({
         id: piece.id,
-        label: piece.title,
+        label: (
+          <>
+            <span className="rh-clink-num">{String(index + 1).padStart(2, "0")}</span>
+            {piece.title}
+          </>
+        ),
         onSelect: () => setActivePieceId(piece.id),
       }))}
     >
@@ -32,9 +37,12 @@ export default function MlJourneyClient({ pieces }: MlJourneyClientProps) {
           <BlogBody body={selectedPiece.body} />
         ) : (
           <>
-            <p className="muted">write your disclaimer here.</p>
+            <p className="muted">these are my machine learning projects. included in each blog is 
+                                the idea behind the project, exploring the data, hypothesis, results, 
+                                analysis, conclusion, and more.
+            </p>
             <br />
-            <p className="muted">click on a machine learning journey title from contents to read it.</p>
+            <p className="muted">click on a project title from contents to read it.</p>
           </>
         )}
       </section>
