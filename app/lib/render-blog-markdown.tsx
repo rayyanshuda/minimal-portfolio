@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { isSafeHref, parseInlineMarkdown } from "./markdown-inline";
 
+const FENCE_MARKER = /^```/;
 const HEADER_LINE = /^(#{1,6})\s+(.+)$/;
 const IMAGE_LINE = /^!\[([^\]]*)\]\(([^)]+)\)$/;
 const UL_ITEM = /^[-*]\s+(.+)$/;
@@ -17,17 +18,41 @@ const TYPE_ATTR = /\btype="([^"]+)"/i;
 function splitBlocks(body: string): string[][] {
   const blocks: string[][] = [];
   let current: string[] = [];
+  let inFence = false;
 
   for (const rawLine of body.split("\n")) {
-    const line = rawLine.trim();
-    if (line.length === 0) {
+    const trimmed = rawLine.trim();
+
+    if (trimmed.startsWith("```")) {
+      if (!inFence) {
+        if (current.length > 0) {
+          blocks.push(current);
+          current = [];
+        }
+        inFence = true;
+        current.push(trimmed);
+      } else {
+        current.push(trimmed);
+        blocks.push(current);
+        current = [];
+        inFence = false;
+      }
+      continue;
+    }
+
+    if (inFence) {
+      current.push(rawLine);
+      continue;
+    }
+
+    if (trimmed.length === 0) {
       if (current.length > 0) {
         blocks.push(current);
         current = [];
       }
       continue;
     }
-    current.push(line);
+    current.push(trimmed);
   }
 
   if (current.length > 0) blocks.push(current);
@@ -75,6 +100,34 @@ function renderList(items: string[], ordered: boolean, key: string): ReactNode {
       ))}
     </ListTag>
   );
+}
+
+function collectOrderedItems(lines: string[]): string[] | null {
+  if (!OL_ITEM.test(lines[0])) return null;
+
+  const items: string[] = [];
+  for (const line of lines) {
+    const match = line.match(OL_ITEM);
+    if (match) {
+      items.push(match[1]);
+    } else {
+      items[items.length - 1] += ` ${line}`;
+    }
+  }
+  return items;
+}
+
+function mergeAdjacentOrderedLists(blocks: string[][]): string[][] {
+  const merged: string[][] = [];
+  for (const block of blocks) {
+    const previous = merged[merged.length - 1];
+    if (previous && OL_ITEM.test(previous[0]) && OL_ITEM.test(block[0])) {
+      previous.push(...block);
+    } else {
+      merged.push([...block]);
+    }
+  }
+  return merged;
 }
 
 function renderVideo(lines: string[], key: string): ReactNode | null {
@@ -134,10 +187,21 @@ function renderTable(lines: string[], key: string): ReactNode {
 }
 
 export function renderBlogMarkdown(body: string): ReactNode {
-  const blocks = splitBlocks(body);
+  const blocks = mergeAdjacentOrderedLists(splitBlocks(body));
 
   return blocks.map((lines, index) => {
     const key = `b${index}`;
+
+    if (lines.length >= 2 && FENCE_MARKER.test(lines[0]) && FENCE_MARKER.test(lines[lines.length - 1])) {
+      const code = lines.slice(1, -1).join("\n");
+      return (
+        <div key={key} className="rh-blog-pre-scroll">
+          <pre className="rh-blog-pre">
+            <code>{code}</code>
+          </pre>
+        </div>
+      );
+    }
 
     if (lines.length === 1) {
       if (HR_LINE.test(lines[0])) {
@@ -173,9 +237,9 @@ export function renderBlogMarkdown(body: string): ReactNode {
       return renderList(items, false, key);
     }
 
-    if (lines.every((line) => OL_ITEM.test(line))) {
-      const items = lines.map((line) => line.match(OL_ITEM)![1]);
-      return renderList(items, true, key);
+    const orderedItems = collectOrderedItems(lines);
+    if (orderedItems) {
+      return renderList(orderedItems, true, key);
     }
 
     if (lines.every((line) => BLOCKQUOTE_LINE.test(line))) {

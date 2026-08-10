@@ -40,8 +40,8 @@ const allProjects = [
 // ];
 
 const blogs = [
-  { name: "my machine learning journey", tag: "essay", href: "/blog/my-machine-learning-journey" },
-  { name: "3d modelling",                tag: "essay", href: "/blog/3d-modelling" },
+  { name: "machine learning", tag: "essay", href: "/blog/machine-learning" },
+  { name: "3d modelling", tag: "essay", href: "/blog/3d-modelling" },
 ];
 
 const filterDefs: { key: Filter; label: string }[] = [

@@ -3,11 +3,25 @@ import "server-only";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import type { ContentPiece, ContentSpacing } from "./content-types";
+import type { ContentPiece, ContentSpacing, ProjectLink } from "./content-types";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
 
 const VALID_SPACING = new Set<ContentSpacing>(["pre", "pre-wrap", "pre-line", "normal"]);
+
+function parseLinks(rawLinks: unknown): ProjectLink[] | undefined {
+  if (!Array.isArray(rawLinks)) return undefined;
+
+  const links = rawLinks
+    .filter((item): item is Record<string, unknown> => typeof item === "object" && item !== null)
+    .map((item) => ({
+      url: typeof item.url === "string" ? item.url : "",
+      label: typeof item.label === "string" ? item.label : undefined,
+    }))
+    .filter((link) => link.url.length > 0);
+
+  return links.length > 0 ? links : undefined;
+}
 
 function parseContentFile(filePath: string): ContentPiece {
   const raw = fs.readFileSync(filePath, "utf8");
@@ -30,6 +44,7 @@ function parseContentFile(filePath: string): ContentPiece {
     title: data.title,
     body: content.trim(),
     caption: typeof data.caption === "string" ? data.caption : undefined,
+    links: parseLinks(data.links),
     order: typeof data.order === "number" ? data.order : undefined,
     spacing,
     className: typeof data.className === "string" ? data.className : undefined,

@@ -2,6 +2,10 @@
 id: parking-space-occupancy
 title: Classifying Parking-Space Occupancy
 order: 1
+links:
+  - url: https://github.com/rayyanshuda/parking-lot-classifier
+  - url: https://web.inf.ufpr.br/vri/databases/parking-lot-database/
+    label: dataset
 ---
 
 ## the idea

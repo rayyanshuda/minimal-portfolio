@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 type RhSiteHeaderProps = {
   title: string;
   subtitle?: string;
-  caption?: string;
+  caption?: ReactNode;
   lede?: ReactNode;
   bubbleText: string;
   avatarHref?: string;

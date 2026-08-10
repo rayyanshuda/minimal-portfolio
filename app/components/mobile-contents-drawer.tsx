@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 
 type MobileContentsItem = {
   id: string;
@@ -77,7 +78,7 @@ export default function MobileContentsDrawer({ title = "contents", activeId, ite
 
             if (item.href) {
               return (
-                <a
+                <Link
                   key={item.id}
                   href={item.href}
                   className={className}
@@ -89,7 +90,7 @@ export default function MobileContentsDrawer({ title = "contents", activeId, ite
                   }}
                 >
                   {item.label}
-                </a>
+                </Link>
               );
             }
 

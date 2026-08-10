@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import Link from "next/link";
 import MobileContentsDrawer from "@/app/components/mobile-contents-drawer";
 import MobileThemeToggle from "@/app/components/mobile-theme-toggle";
 import OverflowMarquee from "@/app/components/overflow-marquee";
@@ -401,7 +402,7 @@ export default function RhPageShell({ children, contentsItems, activeContentId }
 
               if (item.href) {
                 return (
-                  <a
+                  <Link
                     key={item.id}
                     href={item.href}
                     className={className}
@@ -415,7 +416,7 @@ export default function RhPageShell({ children, contentsItems, activeContentId }
                     }
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 );
               }
 

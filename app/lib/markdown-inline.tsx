@@ -3,6 +3,7 @@ import { Fragment, type ReactNode } from "react";
 const LINK_START = /^\[([^\]]+)\]\(([^)]+)\)/;
 const BOLD_START = /^\*\*([^*]+)\*\*|^__([^_]+)__/;
 const ITALIC_START = /^\*([^*]+)\*|^_([^_]+)_/;
+const SUPERSCRIPT_START = /^\$\^([^$]+)\$/;
 
 export function isSafeHref(href: string): boolean {
   const trimmed = href.trim();
@@ -67,7 +68,16 @@ export function parseInlineMarkdown(text: string, keyPrefix = ""): ReactNode[] {
       continue;
     }
 
-    const nextSpecial = remaining.search(/[\[*_]/);
+    const superscriptMatch = remaining.match(SUPERSCRIPT_START);
+    if (superscriptMatch) {
+      nodes.push(
+        <sup key={`${keyPrefix}s${key++}`}>{parseInlineMarkdown(superscriptMatch[1], `${keyPrefix}si${key}-`)}</sup>,
+      );
+      remaining = remaining.slice(superscriptMatch[0].length);
+      continue;
+    }
+
+    const nextSpecial = remaining.search(/[\[*_$]/);
     if (nextSpecial === -1) {
       nodes.push(<Fragment key={`${keyPrefix}t${key++}`}>{remaining}</Fragment>);
       break;
