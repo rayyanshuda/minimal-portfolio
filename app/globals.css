@@ -1792,6 +1792,17 @@ body:has(> .rh-page) {
   border-color: var(--text);
 }
 
+.rh-tag-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid var(--hover-border);
+  border-radius: 4px;
+  font-family: "Spline Sans Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
 .rh-site-header__subtitle + .rh-site-header__caption,
 .rh-site-header__caption + .rh-site-header__subtitle {
   margin-top: 8px;

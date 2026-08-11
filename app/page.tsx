@@ -8,7 +8,8 @@ import RhSiteHeader from "@/app/components/rh-site-header";
  *  TYPES + DATA
  * ------------------------------------------------------------------ */
 
-type Filter = "all" | "cv" | "ml" | "swe";
+type ProjectCategory = "cv" | "ml" | "swe";
+type Filter = "all" | ProjectCategory;
 
 
 const sectionNav = [
@@ -27,17 +28,14 @@ const work = [
   { name: "systems design engineering @ uwaterloo", href: "https://uwaterloo.ca/systems-design-engineering/", note: "undergraduate studies" },
 ];
 
-const allProjects = [
-  { cat: "cv",  name: "deep learning skin lesion classifier", tag: "computer vision",  href: "https://github.com/rayyanshuda/skin-lesion-class",  desc: "detecting skin cancer by analyzing dermoscopic images with deep learning." },
-  { cat: "ml",  name: "ai voice assistant agent",            tag: "machine learning", href: "https://github.com/rayyanshuda/ai-voice-assistant", desc: "an offline conversational agent with system-level commands and live transcription." },
-  { cat: "swe", name: "url shortener",                       tag: "software",         href: "https://github.com/rayyanshuda/url-shortener",     desc: "turns a long url, with an optional custom alias, into a short, shareable link." },
+const allProjects: { cats: ProjectCategory[]; name: string; href: string; desc: string }[] = [
+  { cats: ["cv", "ml"], name: "wildfire detection",                   href: "https://github.com/rayyanshuda/wildfire-detection",  desc: "spotting fire and smoke in wilderness photos, and measuring the advantages of CNN architecture and pretraining." },
+  { cats: ["cv", "ml"], name: "parking space occupancy classifier",   href: "https://github.com/rayyanshuda/skin-lesion-class",   desc: "marks every spot in a lot free or taken from a single fixed-camera frame." },
+  { cats: ["cv"],       name: "deep learning skin lesion classifier", href: "https://github.com/rayyanshuda/skin-lesion-class",   desc: "detecting skin cancer by analyzing dermoscopic images with deep learning." },
+  { cats: ["ml"],       name: "ai voice assistant agent",             href: "https://github.com/rayyanshuda/ai-voice-assistant",  desc: "an offline conversational agent with system-level commands and live transcription." },
+  { cats: ["swe"],      name: "url shortener",                        href: "https://github.com/rayyanshuda/url-shortener",       desc: "turns a long url, with an optional custom alias, into a short, shareable link." }
 ];
 
-// TODO: replace these placeholders with your real papers + links.
-// const papers = [
-//   { tag: "computer vision",  title: "lightweight cnns for dermoscopic skin-lesion classification", venue: "undergraduate research · 2025", cta: "pdf", href: "#" },
-//   { tag: "machine learning", title: "self-supervised pretraining for medical imaging",             venue: "in review",                   cta: "pdf", href: "#" },
-// ];
 
 const blogs = [
   { name: "machine learning", tag: "essay", href: "/blog/machine-learning" },
@@ -51,6 +49,9 @@ const filterDefs: { key: Filter; label: string }[] = [
   { key: "swe", label: "software" },
 ];
 
+const catLabel = (cat: ProjectCategory): string =>
+  filterDefs.find((f) => f.key === cat)?.label ?? cat;
+
 /* shared mono-label style */
 const mono = (extra: React.CSSProperties = {}): React.CSSProperties => ({
   fontFamily: "'Spline Sans Mono', monospace",
@@ -63,6 +64,7 @@ const mono = (extra: React.CSSProperties = {}): React.CSSProperties => ({
 export default function Home() {
   const [filter, setFilter] = useState<Filter>("all");
   const [active, setActive] = useState("work");
+  const [showAllProjects, setShowAllProjects] = useState(false);
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -95,7 +97,8 @@ export default function Home() {
     };
   }, []);
 
-  const projects = filter === "all" ? allProjects : allProjects.filter((p) => p.cat === filter);
+  const projects = filter === "all" ? allProjects : allProjects.filter((p) => p.cats.includes(filter));
+  const visibleProjects = showAllProjects ? projects : projects.slice(0, 3);
 
   /* ---- small reusable bits ---- */
   const SectionHead = ({ n, title }: { n: string; title: string }) => (
@@ -156,7 +159,10 @@ export default function Home() {
                     type="button"
                     className={`rh-filter-item${filter === f.key ? " is-active" : ""}`}
                     aria-pressed={filter === f.key}
-                    onClick={() => setFilter(f.key)}
+                    onClick={() => {
+                      setFilter(f.key);
+                      setShowAllProjects(false);
+                    }}
                   >
                     {f.label}
                   </button>
@@ -164,10 +170,14 @@ export default function Home() {
               ))}
             </div>
             <div style={{ display: "flex", flexDirection: "column", minHeight: 200 }}>
-              {projects.map((p) => (
+              {visibleProjects.map((p) => (
                 <a key={p.name} className="rh-row rh-border" href={p.href} target="_blank" rel="noopener noreferrer"
-                   style={{ textDecoration: "none", color: "inherit", display: "grid", gridTemplateColumns: "120px 1fr", gap: 20, padding: "17px 0", margin: "0 -14px" }}>
-                  <span className="rh-muted" style={mono({ paddingLeft: 14, fontSize: 10.5, letterSpacing: "0.07em", lineHeight: 1.5, paddingTop: 4 })}>{p.tag}</span>
+                   style={{ textDecoration: "none", color: "inherit", display: "grid", gridTemplateColumns: "120px 1fr", gap: 36, padding: "17px 0", margin: "0 -14px" }}>
+                  <span className="rh-muted" style={{ paddingLeft: 14, paddingTop: 4, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6 }}>
+                    {p.cats.map((cat) => (
+                      <span key={cat} className="rh-tag-badge">{catLabel(cat)}</span>
+                    ))}
+                  </span>
                   <span style={{ paddingRight: 14 }}>
                     <span style={{ display: "block", fontSize: 20, fontWeight: 400, letterSpacing: "-0.01em" }}>{p.name}</span>
                     <span className="rh-muted" style={{ display: "block", marginTop: 7, fontSize: 15.5, lineHeight: 1.55, fontWeight: 300, maxWidth: "50ch" }}>{p.desc}</span>
@@ -175,6 +185,16 @@ export default function Home() {
                 </a>
               ))}
             </div>
+            {projects.length > 3 ? (
+              <button
+                type="button"
+                className="rh-filter-item"
+                style={{ marginTop: 14 }}
+                onClick={() => setShowAllProjects((v) => !v)}
+              >
+                {showAllProjects ? "see less" : "see more"}
+              </button>
+            ) : null}
           </section>
 
           {/* 03 RESEARCH */}

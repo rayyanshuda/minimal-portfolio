@@ -300,7 +300,7 @@ The three things I'd tell myself at the start:
 
 This is not a deployable wildfire detector. It's an account of what three models learned, why, and where each of them breaks.
 
-I started this project after witnessing the effects of the wildfire spread in Canada. The losses of my people can't be brought back, and although this project isn't a solution to the modern wildfire spread in my country, it taught me lots of how first responders need to be able to evaluate a fire based on what evidence they have (drone footage, planes, pictures, etc). 
+I started this project after witnessing the effects of the wildfire spread in Canada. The losses of my people can't be brought back, and although this project isn't a solution to the modern wildfire spread in my country, it taught me lots of how first responders need to be able to evaluate a fire based on what evidence they have (drone footage, planes, pictures, etc).
 
 ## reproducibility
 
