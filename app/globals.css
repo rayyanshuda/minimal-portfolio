@@ -1801,6 +1801,7 @@ body:has(> .rh-page) {
   font-size: 10px;
   letter-spacing: 0.04em;
   line-height: 1.4;
+  white-space: nowrap;
 }
 
 .rh-site-header__subtitle + .rh-site-header__caption,
