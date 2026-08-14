@@ -1,7 +1,7 @@
 # rayyan huda
 
 
-i like minimal aesthetics. take away the noise, and what's left is real or nothing at all.
+i like minimal aesthetics.
 
 also, the lowercase theme is a creative choice, not a recurring grammar mistake.
 
@@ -9,7 +9,6 @@ also, the lowercase theme is a creative choice, not a recurring grammar mistake.
 ## what you'll find here
 
 if you want answers, you have to be willing to look for them. go explore.
-
 
 ## art
 
