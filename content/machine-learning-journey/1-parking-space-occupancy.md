@@ -8,6 +8,14 @@ links:
     label: dataset
 ---
 
+## demo
+
+<video controls width="640">
+  <source src="/parking-space-occupancy-prjt/parking_demo.mp4" type="video/mp4">
+</video>
+
+*The classifier over a day of frames, spots turning red as cars arrive, green as they leave.*
+
 ## the idea
 
 Detecting free parking usually sounds like object detection: find every car in a photo of a lot. But if the camera is fixed, the spots never move, their locations are known in advance. That one observation collapses the problem: instead of *detecting* cars anywhere in the frame, I only need to look at each known spot and answer a single binary question: *occupied or empty?*
@@ -127,12 +135,6 @@ Finally, the whole pipeline running live on full-lot frames. Using the fixed-cam
 *A full frame with per-spot predictions: red = occupied, green = empty. (This is a rainy frame, the model handles wet conditions it saw in training.) Notice a false-negatve classification.*
 
 The pipeline runs at **57 FPS (17.5 ms/frame) on a CPU, no GPU**. Parking occupancy changes over minutes, so that's roughly 100× more throughput than the application needs.
-
-<video controls width="640">
-  <source src="/parking-space-occupancy-prjt/parking_demo.mp4" type="video/mp4">
-</video>
-
-*The classifier over a day of frames, spots turning red as cars arrive, green as they leave.*
 
 ## reproducibility
 
