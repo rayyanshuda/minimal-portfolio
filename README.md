@@ -1,33 +1,32 @@
 # rayyan huda
 
 
-i like minimal aesthetics. not because it's trendy, but because i like conveying an idea with only what it needs. nothing more. you strip away the noise and what's left is either something real or nothing at all.
+i like minimal aesthetics.
 
-my design follows that same logic (almost, i still added some extra cool features)
-
-also the lowercase theme is a creative choice, not a recurring grammar mistake.
+also, the lowercase theme is a creative choice, not a recurring grammar mistake.
 
 
 ## what you'll find here
 
-if you want answers, you have to be willing to look for it. go explore.
-
+if you want answers, you have to be willing to look for them. go explore.
 
 ## art
 
-I've fallen in love with countless forms of art, and although I am far from being considered as an artist, I love dipping my toes in different waters, to find new passions. 
+I've fallen in love with countless forms of art, and although I am far from being considered an artist, I love dipping my toes in different waters to find new passions. 
 
 a lot of people have a lot of definitions. mine is simple:
 
 > art is anything with value.
 
-photography. music. a conversation that changes how you see something. a person. everything can be inspected to find art, you just have to be looking.
+photography. music. a conversation that changes how you see something. a person. everything can be inspected to find art; you just have to be looking.
 
-pursuing it, is what makes a life feel like more than just a sequence of days. 
+pursuing it is what makes a life feel like more than just a sequence of days. 
+
+> Choose a job you love, and you will never have to work a day in your life
 
 # find your purpose and chase it
 
-here's a poem i wrote 
+here's a poem I wrote 
 
 > I'll reach for the stars\
 > Even if it bruises my shoulders\
