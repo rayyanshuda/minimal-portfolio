@@ -22,7 +22,12 @@ export default function ResearchPage() {
       <RhSubpageHeader title="research" />
 
       <section className="section" id="research" style={{ marginTop: 46 }}>
-        <p className="muted">nothing published here yet — check back soon.</p>
+        <p className="muted">these are write-ups that go outside the standard ml curriculum,
+                            reproducing papers, running ablations, and reporting what actually
+                            held up.
+        </p>
+        <br />
+        <p className="muted">click on a project title from contents to read it.</p>
       </section>
     </RhPageShell>
   );

@@ -142,4 +142,4 @@ Data comes from the [PKLot database](https://web.inf.ufpr.br/vri/databases/parki
 
 ---
 
-*Tools: NumPy, Matplotlib, OpenCV, scikit-image, scikit-learn. Built as a from-scratch classical ML project.*
+*Tools: NumPy, Matplotlib, OpenCV, scikit-image, scikit-learn. A classical ML project.*

@@ -1,9 +1,11 @@
 import { Fragment, type ReactNode } from "react";
+import { renderMathToHtml } from "./render-math";
 
 const LINK_START = /^\[([^\]]+)\]\(([^)]+)\)/;
 const BOLD_START = /^\*\*([^*]+)\*\*|^__([^_]+)__/;
 const ITALIC_START = /^\*([^*]+)\*|^_([^_]+)_/;
 const SUPERSCRIPT_START = /^\$\^([^$]+)\$/;
+const MATH_INLINE_START = /^\$([^$\n]+)\$/;
 
 export function isSafeHref(href: string): boolean {
   const trimmed = href.trim();
@@ -74,6 +76,19 @@ export function parseInlineMarkdown(text: string, keyPrefix = ""): ReactNode[] {
         <sup key={`${keyPrefix}s${key++}`}>{parseInlineMarkdown(superscriptMatch[1], `${keyPrefix}si${key}-`)}</sup>,
       );
       remaining = remaining.slice(superscriptMatch[0].length);
+      continue;
+    }
+
+    const mathMatch = remaining.match(MATH_INLINE_START);
+    if (mathMatch) {
+      nodes.push(
+        <span
+          key={`${keyPrefix}m${key++}`}
+          className="rh-blog-math-inline"
+          dangerouslySetInnerHTML={{ __html: renderMathToHtml(mathMatch[1], false) }}
+        />,
+      );
+      remaining = remaining.slice(mathMatch[0].length);
       continue;
     }
 

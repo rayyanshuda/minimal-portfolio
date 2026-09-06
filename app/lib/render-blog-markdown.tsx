@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { isSafeHref, parseInlineMarkdown } from "./markdown-inline";
+import { renderMathToHtml } from "./render-math";
 
 const FENCE_MARKER = /^```/;
 const HEADER_LINE = /^(#{1,6})\s+(.+)$/;
@@ -14,6 +15,16 @@ const VIDEO_WIDTH_ATTR = /^<video\b[^>]*\swidth="(\d+)"/i;
 const VIDEO_SOURCE_TAG = /<source\b[^>]*>/i;
 const SRC_ATTR = /\bsrc="([^"]+)"/i;
 const TYPE_ATTR = /\btype="([^"]+)"/i;
+const MATH_BLOCK_MARKER = /^\$\$$/;
+const MATH_BLOCK_INLINE = /^\$\$(.+)\$\$$/;
+
+function renderMathBlock(tex: string, key: string): ReactNode {
+  return (
+    <div key={key} className="rh-blog-math-scroll">
+      <div className="rh-blog-math-display" dangerouslySetInnerHTML={{ __html: renderMathToHtml(tex.trim(), true) }} />
+    </div>
+  );
+}
 
 function splitBlocks(body: string): string[][] {
   const blocks: string[][] = [];
@@ -221,10 +232,19 @@ export function renderBlogMarkdown(body: string): ReactNode {
           return <img key={key} src={src} alt={alt} className="rh-blog-image" />;
         }
       }
+
+      const mathInlineMatch = lines[0].match(MATH_BLOCK_INLINE);
+      if (mathInlineMatch) {
+        return renderMathBlock(mathInlineMatch[1], key);
+      }
     }
 
     if (lines.length >= 2 && lines[0].includes("|") && isTableSeparatorRow(lines[1])) {
       return renderTable(lines, key);
+    }
+
+    if (lines.length >= 2 && MATH_BLOCK_MARKER.test(lines[0]) && MATH_BLOCK_MARKER.test(lines[lines.length - 1])) {
+      return renderMathBlock(lines.slice(1, -1).join(" "), key);
     }
 
     if (VIDEO_BLOCK_START.test(lines[0]) && VIDEO_BLOCK_END.test(lines[lines.length - 1])) {

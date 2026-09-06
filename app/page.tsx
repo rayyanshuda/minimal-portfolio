@@ -42,6 +42,10 @@ const blogs = [
   { name: "3d modelling", tag: "essay", href: "/blog/3d-modelling" },
 ];
 
+const research = [
+  { name: "decomposing group dro", tag: "paper", href: "/research/group-dro" },
+];
+
 const filterDefs: { key: Filter; label: string }[] = [
   { key: "all", label: "all" },
   { key: "cv",  label: "computer vision" },
@@ -200,22 +204,15 @@ export default function Home() {
           {/* 03 RESEARCH */}
           <section id="research" style={{ marginTop: 46, scrollMarginTop: 36 }}>
             <SectionHead n="03" title="research" />
-            <p style={{ margin: 0, fontSize: 18, fontWeight: 300, lineHeight: 1.62, maxWidth: "52ch" }}>
-              the learning comes before the research. i&apos;m almost there.
-            </p>
-            {/* <div style={{ display: "flex", flexDirection: "column" }}>
-              {papers.map((r) => (
-                <a key={r.title} className="rh-row rh-border" href={r.href} target="_blank" rel="noopener noreferrer"
-                   style={{ textDecoration: "none", color: "inherit", display: "grid", gridTemplateColumns: "120px 1fr auto", gap: 20, padding: "17px 0", margin: "0 -14px" }}>
-                  <span className="rh-muted" style={mono({ paddingLeft: 14, fontSize: 10.5, letterSpacing: "0.07em", lineHeight: 1.5, paddingTop: 3 })}>{r.tag}</span>
-                  <span>
-                    <span style={{ display: "block", fontSize: 18, fontWeight: 400, letterSpacing: "-0.01em", lineHeight: 1.3 }}>{r.title}</span>
-                    <span className="rh-muted" style={{ display: "block", marginTop: 5, fontSize: 13.5, fontWeight: 300, fontStyle: "italic" }}>{r.venue}</span>
-                  </span>
-                  <span className="rh-muted" style={mono({ paddingRight: 14, alignSelf: "center", fontSize: 10.5, letterSpacing: "0.1em", textTransform: "uppercase" })}>{r.cta}</span>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {research.map((r) => (
+                <a key={r.name} className="rh-row rh-border" href={r.href}
+                   style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 18, padding: "13px 0", margin: "0 -14px" }}>
+                  <span style={{ paddingLeft: 14, fontSize: 18 }}>{r.name}</span>
+                  <span className="rh-muted" style={mono({ paddingRight: 14, fontSize: 10.5, letterSpacing: "0.07em" })}>{r.tag}</span>
                 </a>
               ))}
-            </div> */}
+            </div>
           </section>
 
           {/* 04 WRITING */}
