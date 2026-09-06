@@ -8,7 +8,7 @@ import RhSiteHeader from "@/app/components/rh-site-header";
  *  TYPES + DATA
  * ------------------------------------------------------------------ */
 
-type ProjectCategory = "cv" | "ml" | "swe";
+type ProjectCategory = "cv" | "ml" | "swe" | "ai";
 type Filter = "all" | ProjectCategory;
 
 
@@ -29,6 +29,7 @@ const work = [
 ];
 
 const allProjects: { cats: ProjectCategory[]; name: string; href: string; desc: string }[] = [
+  { cats: ["swe", "ai"], name: "research assistant agent",             href: "https://github.com/rayyanshuda/research-assistant",  desc: "an agent that answers questions about PDFs or notes you upload, with citations back to the source file and page." },
   { cats: ["cv", "ml"], name: "wildfire detection",                   href: "https://github.com/rayyanshuda/wildfire-detection",  desc: "spotting fire and smoke in wilderness photos, and measuring the advantages of CNN architecture and pretraining." },
   { cats: ["cv", "ml"], name: "parking space occupancy classifier",   href: "https://github.com/rayyanshuda/skin-lesion-class",   desc: "marks every spot in a lot free or taken from a single fixed-camera frame." },
   { cats: ["cv"],       name: "deep learning skin lesion classifier", href: "https://github.com/rayyanshuda/skin-lesion-class",   desc: "detecting skin cancer by analyzing dermoscopic images with deep learning." },
@@ -50,6 +51,7 @@ const filterDefs: { key: Filter; label: string }[] = [
   { key: "all", label: "all" },
   { key: "cv",  label: "computer vision" },
   { key: "ml",  label: "machine learning" },
+  { key: "ai",  label: "ai" },
   { key: "swe", label: "software" },
 ];
 
