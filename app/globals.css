@@ -791,8 +791,8 @@ body:has(> .rh-page) {
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  gap: 0.6rem;
-  padding: 0.7rem;
+  gap: 0.45rem;
+  padding: 0.5rem;
   text-align: center;
 }
 
@@ -805,7 +805,8 @@ body:has(> .rh-page) {
 }
 
 /* caption + date sit on fixed off-white "paper" (not theme colors) so they stay legible on any photo */
-/* both boxes have a max size; FitText (photography/page.tsx) shrinks the text only once it would overflow */
+/* both boxes have a max size; FitText (photography/page.tsx) shrinks the text only once it would overflow.
+   padding is in em so the box frame shrinks along with the text. */
 .photo-caption {
   display: block;
   flex: 0 1 auto;
@@ -814,7 +815,7 @@ body:has(> .rh-page) {
   max-height: 78%;
   min-height: 0;
   overflow: hidden;
-  padding: 0.7rem 0.75rem 1.35rem;
+  padding: 0.7em 0.75em 1.35em;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 2px;
   background: #f6f3ec;
@@ -835,7 +836,7 @@ body:has(> .rh-page) {
   max-width: 100%;
   overflow: hidden;
   white-space: nowrap;
-  padding: 0.3rem 0.55rem;
+  padding: 0.35em 0.6em;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 2px;
   background: #f6f3ec;
@@ -2138,7 +2139,7 @@ body:has(> .rh-page) {
 .rh-main .photo-date {
   font-family: "Spline Sans Mono", monospace;
   font-size: 0.72rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
 }
 
 .rh-main .photo-caption {

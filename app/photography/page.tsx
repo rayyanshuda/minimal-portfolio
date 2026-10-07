@@ -233,11 +233,9 @@ const photoCards: PhotoCard[] = [
   },
 ];
 
-const MIN_FIT_FONT_PX = 9;
-
 // Text box that keeps its normal CSS font size, and only shrinks the text once the
 // box has hit its max size (set in CSS) and the text would otherwise overflow.
-function FitText({ className, children }: { className: string; children: string }) {
+function FitText({ className, minPx, children }: { className: string; minPx: number; children: string }) {
   const ref = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
@@ -248,8 +246,8 @@ function FitText({ className, children }: { className: string; children: string 
       el.style.fontSize = "";
       let size = parseFloat(window.getComputedStyle(el).fontSize);
       const overflows = () => el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1;
-      while (overflows() && size > MIN_FIT_FONT_PX) {
-        size -= 0.5;
+      while (overflows() && size > minPx) {
+        size = Math.max(size - 0.5, minPx);
         el.style.fontSize = `${size}px`;
       }
     };
@@ -258,8 +256,18 @@ function FitText({ className, children }: { className: string; children: string 
     // refit when the card resizes (lazy-loaded image, window resize)
     const observer = new ResizeObserver(fit);
     if (el.parentElement) observer.observe(el.parentElement);
-    return () => observer.disconnect();
-  }, [children]);
+    // refit once web fonts swap in (Google Fonts uses display=swap, so the first fit uses the fallback font)
+    let cancelled = false;
+    document.fonts.ready.then(() => {
+      if (!cancelled) fit();
+    });
+    document.fonts.addEventListener("loadingdone", fit);
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      document.fonts.removeEventListener("loadingdone", fit);
+    };
+  }, [children, minPx]);
 
   return (
     <span ref={ref} className={className}>
@@ -351,8 +359,12 @@ export default function PhotographyPage() {
                           className="photo-card-back-image"
                         />
                         <div className="photo-card-back-content">
-                          <FitText className="photo-caption">{photo.caption}</FitText>
-                          <FitText className="photo-date">{photo.date}</FitText>
+                          <FitText className="photo-caption" minPx={8}>
+                            {photo.caption}
+                          </FitText>
+                          <FitText className="photo-date" minPx={7}>
+                            {photo.date}
+                          </FitText>
                         </div>
                       </div>
                     </div>
