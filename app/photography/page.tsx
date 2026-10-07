@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyboardEvent, useState } from "react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import RhPageShell from "@/app/components/rh-page-shell";
 import RhSubpageHeader from "@/app/components/rh-subpage-header";
 
@@ -233,6 +233,41 @@ const photoCards: PhotoCard[] = [
   },
 ];
 
+const MIN_FIT_FONT_PX = 9;
+
+// Text box that keeps its normal CSS font size, and only shrinks the text once the
+// box has hit its max size (set in CSS) and the text would otherwise overflow.
+function FitText({ className, children }: { className: string; children: string }) {
+  const ref = useRef<HTMLSpanElement | null>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const fit = () => {
+      el.style.fontSize = "";
+      let size = parseFloat(window.getComputedStyle(el).fontSize);
+      const overflows = () => el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1;
+      while (overflows() && size > MIN_FIT_FONT_PX) {
+        size -= 0.5;
+        el.style.fontSize = `${size}px`;
+      }
+    };
+
+    fit();
+    // refit when the card resizes (lazy-loaded image, window resize)
+    const observer = new ResizeObserver(fit);
+    if (el.parentElement) observer.observe(el.parentElement);
+    return () => observer.disconnect();
+  }, [children]);
+
+  return (
+    <span ref={ref} className={className}>
+      {children}
+    </span>
+  );
+}
+
 export default function PhotographyPage() {
   const [flippedIds, setFlippedIds] = useState<Set<string>>(() => new Set());
 
@@ -316,8 +351,8 @@ export default function PhotographyPage() {
                           className="photo-card-back-image"
                         />
                         <div className="photo-card-back-content">
-                          <span className="photo-caption">{photo.caption}</span>
-                          <span className="photo-date">{photo.date}</span>
+                          <FitText className="photo-caption">{photo.caption}</FitText>
+                          <FitText className="photo-date">{photo.date}</FitText>
                         </div>
                       </div>
                     </div>
