@@ -23,7 +23,7 @@ const sectionNav = [
 
 const work = [
   { name: "CloudAct CPA", href: "https://cloudact.ca/", note: "testing and developing ai agents" },
-  { name: "WAT.ai", href: "https://watai.ca/", note: "machine learning projects" },
+  { name: "WATonomous", href: "https://www.watonomous.ca/", note: "robotics and AI software design for autonomous vehicles" },
   { name: "github", href: "https://github.com/rayyanshuda", note: "miscellaneous projects" },
   { name: "systems design engineering @ uwaterloo", href: "https://uwaterloo.ca/systems-design-engineering/", note: "undergraduate studies" },
 ];
@@ -31,6 +31,7 @@ const work = [
 const allProjects: { cats: ProjectCategory[]; name: string; href: string; desc: string }[] = [
   { cats: ["swe", "ai"], name: "research assistant agent",             href: "https://github.com/rayyanshuda/research-assistant",  desc: "an agent that answers questions about PDFs or notes you upload, with citations back to the source file and page." },
   { cats: ["cv", "ml"], name: "wildfire detection",                   href: "https://github.com/rayyanshuda/wildfire-detection",  desc: "spotting fire and smoke in wilderness photos, and measuring the advantages of CNN architecture and pretraining." },
+  { cats: ["swe", "ai"], name: "clinical trials visualization agent", href: "https://github.com/rayyanshuda/ctgov-viz-agent",  desc: "turns natural-language clinical trial questions into visual specs (graphs, tables, histograms, scatter plots, etc.) from ClinicalTrials.gov data" },
   { cats: ["cv", "ml"], name: "parking space occupancy classifier",   href: "https://github.com/rayyanshuda/skin-lesion-class",   desc: "marks every spot in a lot free or taken from a single fixed-camera frame." },
   { cats: ["cv"],       name: "deep learning skin lesion classifier", href: "https://github.com/rayyanshuda/skin-lesion-class",   desc: "detecting skin cancer by analyzing dermoscopic images with deep learning." },
   { cats: ["ml"],       name: "ai voice assistant agent",             href: "https://github.com/rayyanshuda/ai-voice-assistant",  desc: "an offline conversational agent with system-level commands and live transcription." },
