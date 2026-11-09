@@ -1,0 +1,440 @@
+/* Record-store photography journal (record-store-photos.tsx), shown inside the record store frame. */
+
+.rj,
+.rs-player {
+  --rj-navy: #1d3557;
+  --rj-red: #c8323a;
+  --rj-cream: #f4ecdc;
+  --rj-card: #fbf7ee;
+}
+
+.rj-label {
+  margin: 0;
+  font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  font-size: 10.5px;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.rj {
+  margin-top: 40px;
+}
+
+/* ---------------- one entry ---------------- */
+.rj-entry {
+  --cover: 230px;
+  display: grid;
+  grid-template-columns: calc(var(--cover) * 1.42) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  padding: 40px 0;
+  border-bottom: 1px solid var(--divider);
+  scroll-margin-top: 30px;
+}
+
+.rj-entry:first-child {
+  padding-top: 0;
+}
+
+.rj-entry.is-flip {
+  grid-template-columns: minmax(0, 1fr) calc(var(--cover) * 1.42);
+}
+
+.rj-entry.is-flip .rj-art {
+  order: 2;
+}
+
+/* ---- cover + vinyl ---- */
+.rj-art {
+  position: relative;
+  display: block;
+  height: var(--cover);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.rj-cover,
+.rj-vinyl {
+  position: absolute;
+  top: 0;
+  width: var(--cover);
+  height: var(--cover);
+}
+
+.rj-cover {
+  left: 0;
+  z-index: 1;
+  overflow: hidden;
+  background: var(--rj-card);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05), 0 14px 28px rgba(20, 30, 50, 0.2);
+  transition: transform 300ms ease;
+}
+
+.rj-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* faint ring wear */
+.rj-cover::after {
+  content: "";
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+/* the record, half out of the sleeve on the side facing the text */
+.rj-vinyl {
+  left: 0;
+  transform: translateX(42%);
+  transition: transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.rj-entry.is-flip .rj-cover {
+  left: auto;
+  right: 0;
+}
+
+.rj-entry.is-flip .rj-vinyl {
+  left: auto;
+  right: 0;
+  transform: translateX(-42%);
+}
+
+.rj-grooves {
+  position: absolute;
+  inset: 3%;
+  border-radius: 50%;
+  /* colored pressing: the disc is pressed in the photo's main color (--v1) with grooves cut
+     into it, and its second color (--v2) rings the label and the outer edge */
+  background:
+    radial-gradient(
+      circle closest-side,
+      transparent 0 32%,
+      var(--v2, #c8323a) 32% 36%,
+      color-mix(in srgb, var(--v1, #1d3557) 70%, #000) 36% 39%,
+      transparent 39%
+    ),
+    radial-gradient(circle closest-side, transparent 0 94%, var(--v2, #c8323a) 94% 97.5%, transparent 97.5%),
+    /* light catching the vinyl */
+    conic-gradient(
+      from 30deg,
+      transparent 0 6%,
+      rgba(255, 255, 255, 0.16) 10%,
+      transparent 16% 50%,
+      rgba(255, 255, 255, 0.12) 60%,
+      transparent 66%
+    ),
+    repeating-radial-gradient(
+      circle closest-side,
+      color-mix(in srgb, var(--v1, #1d3557) 78%, #000) 0 1.5px,
+      color-mix(in srgb, var(--v1, #1d3557) 92%, #000) 1.5px 3px
+    );
+  box-shadow: 0 10px 24px rgba(20, 30, 50, 0.3);
+}
+
+.rj-grooves img {
+  position: absolute;
+  inset: 34%;
+  width: 32%;
+  height: 32%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.rj-grooves::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: var(--rj-cream);
+}
+
+/* spins while the entry is on screen */
+.rj-entry.is-playing .rj-grooves {
+  animation: rj-spin 3.6s linear infinite;
+}
+
+@keyframes rj-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rj-art:hover .rj-vinyl {
+  transform: translateX(52%);
+}
+
+.rj-entry.is-flip .rj-art:hover .rj-vinyl {
+  transform: translateX(-52%);
+}
+
+.rj-art:hover .rj-cover {
+  transform: translateY(-4px);
+}
+
+/* ---- text ---- */
+.rj-entry.is-flip .rj-text {
+  text-align: right;
+}
+
+.rj-track {
+  color: var(--rj-red);
+}
+
+.rj-caption {
+  margin: 10px 0 10px;
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.rj-date {
+  color: var(--muted);
+}
+
+.rj-play {
+  margin-top: 16px;
+  padding: 7px 12px;
+  border: 2px solid var(--rj-navy);
+  background: none;
+  color: var(--rj-navy);
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.rj-play:hover {
+  background: var(--rj-navy);
+  color: var(--rj-cream);
+}
+
+/* ---------------- turntable view ---------------- */
+.rs-player {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(16, 28, 48, 0.97);
+  cursor: zoom-out;
+  animation: rs-fade 180ms ease;
+}
+
+@keyframes rs-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.rs-player-deck {
+  --vinyl: min(58vh, 32vw);
+  display: flex;
+  align-items: center;
+  gap: clamp(28px, 4vw, 56px);
+  cursor: default;
+}
+
+/* right padding reserves room for the half of the record that slides out */
+.rs-player-stage {
+  position: relative;
+  display: inline-flex;
+  padding-right: calc(var(--vinyl) * 0.5);
+}
+
+.rs-player-cover {
+  position: relative;
+  z-index: 1;
+  display: block;
+  max-height: 72vh;
+  max-width: 40vw;
+  width: auto;
+  height: auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.rs-player-vinyl {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--vinyl) * 0.5);
+  width: var(--vinyl);
+  height: var(--vinyl);
+  transform: translate(0, -50%);
+  animation: rs-slide-out 700ms cubic-bezier(0.2, 0.8, 0.2, 1) 120ms forwards;
+}
+
+@keyframes rs-slide-out {
+  to {
+    transform: translate(50%, -50%);
+  }
+}
+
+.rs-player-grooves {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  /* colored pressing: the disc is pressed in the photo's main color (--v1) with grooves cut
+     into it, and its second color (--v2) rings the label and the outer edge */
+  background:
+    radial-gradient(
+      circle closest-side,
+      transparent 0 32%,
+      var(--v2, #c8323a) 32% 36%,
+      color-mix(in srgb, var(--v1, #1d3557) 70%, #000) 36% 39%,
+      transparent 39%
+    ),
+    radial-gradient(circle closest-side, transparent 0 94%, var(--v2, #c8323a) 94% 97.5%, transparent 97.5%),
+    /* light catching the vinyl */
+    conic-gradient(
+      from 30deg,
+      transparent 0 6%,
+      rgba(255, 255, 255, 0.16) 10%,
+      transparent 16% 50%,
+      rgba(255, 255, 255, 0.12) 60%,
+      transparent 66%
+    ),
+    repeating-radial-gradient(
+      circle closest-side,
+      color-mix(in srgb, var(--v1, #1d3557) 78%, #000) 0 1.5px,
+      color-mix(in srgb, var(--v1, #1d3557) 92%, #000) 1.5px 3px
+    );
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  animation: rj-spin 3.6s linear infinite;
+}
+
+.rs-player-label {
+  position: absolute;
+  inset: 34%;
+  width: 32%;
+  height: 32%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.rs-player-info {
+  width: min(300px, 80vw);
+  color: #f4ecdc;
+}
+
+.rs-player-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e7a3a6;
+}
+
+.rs-player-title {
+  margin: 12px 0 12px;
+  font-size: 26px;
+  line-height: 1.3;
+}
+
+.rs-player-date {
+  color: rgba(244, 236, 220, 0.6);
+}
+
+.rs-player-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.rs-player-controls button {
+  width: 48px;
+  height: 38px;
+  border: 0;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #e9ecef, #b9bec5);
+  color: #1d3557;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.2), 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.rs-player-controls button:hover {
+  background: #c8323a;
+  color: #f4ecdc;
+}
+
+.rs-player-controls button:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rs-player-grooves {
+    animation: none;
+  }
+
+  .rs-player-vinyl {
+    animation-duration: 1ms;
+  }
+}
+
+
+.rs-player-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c8323a;
+  box-shadow: 0 0 0 3px rgba(200, 50, 58, 0.25);
+}
+
+/* ---------------- motion + phones ---------------- */
+@media (prefers-reduced-motion: reduce) {
+  .rj-entry.is-playing .rj-grooves,
+  .rs-player-grooves {
+    animation: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .rj-entry,
+  .rj-entry.is-flip {
+    --cover: min(62vw, 240px);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .rj-entry.is-flip .rj-art {
+    order: 0;
+  }
+
+  .rj-art {
+    width: calc(var(--cover) * 1.36);
+  }
+
+  .rj-entry.is-flip .rj-art {
+    margin-left: auto;
+  }
+
+  .rs-player-deck {
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .rs-player-stage {
+    padding-right: 0;
+  }
+
+  .rs-player-cover {
+    max-width: 78vw;
+    max-height: 56vh;
+  }
+
+  .rs-player-vinyl {
+    display: none;
+  }
+}

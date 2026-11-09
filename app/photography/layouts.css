@@ -1,0 +1,86 @@
+/* Photo journal for the classic and broadsheet themes (JournalLayout in layouts.tsx). */
+
+/* ---------- journal ---------- */
+.ph-journal-year + .ph-journal-year {
+  margin-top: 46px;
+}
+
+.ph-journal-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding-bottom: 10px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.ph-journal-yr {
+  font-family: var(--rh-serif);
+  font-size: 2.1rem;
+  line-height: 1;
+}
+
+.ph-journal-count,
+.ph-journal-date {
+  font-family: "Spline Sans Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ph-journal-entry {
+  display: grid;
+  grid-template-columns: 58% 1fr;
+  gap: 22px;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.ph-journal-photo {
+  justify-content: flex-start;
+}
+
+.ph-journal-entry:nth-of-type(even) .ph-journal-photo {
+  order: 2;
+  justify-content: flex-end;
+}
+
+.ph-journal-entry:nth-of-type(even) {
+  grid-template-columns: 1fr 58%;
+}
+
+.ph-journal-photo {
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.ph-journal-photo img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 360px;
+}
+
+.rh-main .ph-journal-caption {
+  margin: 8px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+/* ---------- phones ---------- */
+@media (max-width: 760px) {
+  .ph-journal-entry,
+  .ph-journal-entry:nth-of-type(even) {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .ph-journal-entry:nth-of-type(even) .ph-journal-photo {
+    order: 0;
+  }
+}

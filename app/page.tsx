@@ -3,61 +3,19 @@
 import { Fragment, useEffect, useState } from "react";
 import RhPageShell from "@/app/components/rh-page-shell";
 import RhSiteHeader from "@/app/components/rh-site-header";
+import { useSiteTheme } from "@/app/lib/site-theme";
 
-/* ------------------------------------------------------------------ *
- *  TYPES + DATA
- * ------------------------------------------------------------------ */
-
-type ProjectCategory = "cv" | "ml" | "swe" | "ai";
-type Filter = "all" | ProjectCategory;
-
-
-const sectionNav = [
-  { id: "work", label: "work" },
-  { id: "projects", label: "projects" },
-  { id: "research", label: "research" },
-  { id: "writing", label: "writing" },
-  { id: "passions", label: "passions" },
-  { id: "connect", label: "connect" },
-];
-
-const work = [
-  { name: "CloudAct CPA", href: "https://cloudact.ca/", note: "testing and developing ai agents" },
-  { name: "WATonomous", href: "https://www.watonomous.ca/", note: "robotics and AI software design for autonomous vehicles" },
-  { name: "github", href: "https://github.com/rayyanshuda", note: "miscellaneous projects" },
-  { name: "systems design engineering @ uwaterloo", href: "https://uwaterloo.ca/systems-design-engineering/", note: "undergraduate studies" },
-];
-
-const allProjects: { cats: ProjectCategory[]; name: string; href: string; desc: string }[] = [
-  { cats: ["swe", "ai"], name: "research assistant agent",             href: "https://github.com/rayyanshuda/research-assistant",  desc: "an agent that answers questions about PDFs or notes you upload, with citations back to the source file and page." },
-  { cats: ["cv", "ml"], name: "wildfire detection",                   href: "https://github.com/rayyanshuda/wildfire-detection",  desc: "spotting fire and smoke in wilderness photos, and measuring the advantages of CNN architecture and pretraining." },
-  { cats: ["swe", "ai"], name: "clinical trials visualization agent", href: "https://github.com/rayyanshuda/ctgov-viz-agent",  desc: "turns natural-language clinical trial questions into visual specs (graphs, tables, histograms, scatter plots, etc.) from ClinicalTrials.gov data" },
-  { cats: ["cv", "ml"], name: "parking space occupancy classifier",   href: "https://github.com/rayyanshuda/skin-lesion-class",   desc: "marks every spot in a lot free or taken from a single fixed-camera frame." },
-  { cats: ["cv"],       name: "deep learning skin lesion classifier", href: "https://github.com/rayyanshuda/skin-lesion-class",   desc: "detecting skin cancer by analyzing dermoscopic images with deep learning." },
-  { cats: ["ml"],       name: "ai voice assistant agent",             href: "https://github.com/rayyanshuda/ai-voice-assistant",  desc: "an offline conversational agent with system-level commands and live transcription." },
-  { cats: ["swe"],      name: "url shortener",                        href: "https://github.com/rayyanshuda/url-shortener",       desc: "turns a long url, with an optional custom alias, into a short, shareable link." }
-];
-
-
-const blogs = [
-  { name: "machine learning", tag: "essay", href: "/blog/machine-learning" },
-  { name: "3d modelling", tag: "essay", href: "/blog/3d-modelling" },
-];
-
-const research = [
-  { name: "decomposing group dro", tag: "paper", href: "/research/group-dro" },
-];
-
-const filterDefs: { key: Filter; label: string }[] = [
-  { key: "all", label: "all" },
-  { key: "cv",  label: "computer vision" },
-  { key: "ml",  label: "machine learning" },
-  { key: "ai",  label: "ai" },
-  { key: "swe", label: "software" },
-];
-
-const catLabel = (cat: ProjectCategory): string =>
-  filterDefs.find((f) => f.key === cat)?.label ?? cat;
+import {
+  allProjects,
+  blogs,
+  catLabel,
+  filterDefs,
+  research,
+  sectionNav,
+  work,
+  type Filter,
+} from "@/app/lib/home-content";
+import { AltHome, hasAltHome } from "@/app/home-layouts";
 
 /* shared mono-label style */
 const mono = (extra: React.CSSProperties = {}): React.CSSProperties => ({
@@ -68,7 +26,7 @@ const mono = (extra: React.CSSProperties = {}): React.CSSProperties => ({
 /* ------------------------------------------------------------------ *
  *  PAGE
  * ------------------------------------------------------------------ */
-export default function Home() {
+function ClassicHome() {
   const [filter, setFilter] = useState<Filter>("all");
   const [active, setActive] = useState("work");
   const [showAllProjects, setShowAllProjects] = useState(false);
@@ -109,10 +67,10 @@ export default function Home() {
 
   /* ---- small reusable bits ---- */
   const SectionHead = ({ n, title }: { n: string; title: string }) => (
-    <div style={{ display: "flex", alignItems: "baseline", gap: 13, marginBottom: 15 }}>
-      <span className="rh-muted" style={mono({ fontSize: 11 })}>{n}</span>
-      <h2 style={{ margin: 0, fontSize: 22, fontWeight: 500, letterSpacing: "-0.01em" }}>{title}</h2>
-      <span className="rh-div" style={{ flex: 1, height: 1 }} />
+    <div className="rh-section-head" style={{ display: "flex", alignItems: "baseline", gap: 13, marginBottom: 15 }}>
+      <span className="rh-muted rh-section-num" style={mono({ fontSize: 11 })}>{n}</span>
+      <h2 className="rh-section-title" style={{ margin: 0, fontSize: 22, fontWeight: 500, letterSpacing: "-0.01em" }}>{title}</h2>
+      <span className="rh-div rh-section-rule" style={{ flex: 1, height: 1 }} />
     </div>
   );
 
@@ -142,7 +100,7 @@ export default function Home() {
             <SectionHead n="01" title="work" />
             <div style={{ display: "flex", flexDirection: "column" }}>
               {work.map((w) => (
-                <a key={w.name} className="rh-row" href={w.href} target="_blank" rel="noopener noreferrer"
+                <a key={w.name} className="rh-row rh-work-row" href={w.href} target="_blank" rel="noopener noreferrer"
                    style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "baseline", gap: 14, padding: "10px 0", margin: "0 -14px" }}>
                   <span style={{ paddingLeft: 14, fontSize: 17 }}>{w.name}</span>
                   <span className="rh-muted" style={{ flex: 1, fontSize: 14, fontWeight: 300, textAlign: "right", paddingRight: 14 }}>{w.note}</span>
@@ -178,7 +136,7 @@ export default function Home() {
             </div>
             <div style={{ display: "flex", flexDirection: "column", minHeight: 200 }}>
               {visibleProjects.map((p) => (
-                <a key={p.name} className="rh-row rh-border" href={p.href} target="_blank" rel="noopener noreferrer"
+                <a key={p.name} className="rh-row rh-border rh-project-row" data-cat={p.cats[0]} href={p.href} target="_blank" rel="noopener noreferrer"
                    style={{ textDecoration: "none", color: "inherit", display: "grid", gridTemplateColumns: "120px 1fr", gap: 36, padding: "17px 0", margin: "0 -14px" }}>
                   <span className="rh-muted" style={{ paddingLeft: 14, paddingTop: 4, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6 }}>
                     {p.cats.map((cat) => (
@@ -195,7 +153,7 @@ export default function Home() {
             {projects.length > 3 ? (
               <button
                 type="button"
-                className="rh-filter-item"
+                className="rh-filter-item rh-see-more"
                 style={{ marginTop: 14 }}
                 onClick={() => setShowAllProjects((v) => !v)}
               >
@@ -209,7 +167,7 @@ export default function Home() {
             <SectionHead n="03" title="research" />
             <div style={{ display: "flex", flexDirection: "column" }}>
               {research.map((r) => (
-                <a key={r.name} className="rh-row rh-border" href={r.href}
+                <a key={r.name} className="rh-row rh-border rh-list-row" href={r.href}
                    style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 18, padding: "13px 0", margin: "0 -14px" }}>
                   <span style={{ paddingLeft: 14, fontSize: 18 }}>{r.name}</span>
                   <span className="rh-muted" style={mono({ paddingRight: 14, fontSize: 10.5, letterSpacing: "0.07em" })}>{r.tag}</span>
@@ -223,7 +181,7 @@ export default function Home() {
             <SectionHead n="04" title="writing" />
             <div style={{ display: "flex", flexDirection: "column" }}>
               {blogs.map((b) => (
-                <a key={b.name} className="rh-row rh-border" href={b.href}
+                <a key={b.name} className="rh-row rh-border rh-list-row" href={b.href}
                    style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 18, padding: "13px 0", margin: "0 -14px" }}>
                   <span style={{ paddingLeft: 14, fontSize: 18 }}>{b.name}</span>
                   <span className="rh-muted" style={mono({ paddingRight: 14, fontSize: 10.5, letterSpacing: "0.07em" })}>{b.tag}</span>
@@ -235,7 +193,7 @@ export default function Home() {
           {/* 05 PASSIONS */}
           <section id="passions" style={{ marginTop: 46, scrollMarginTop: 36 }}>
             <SectionHead n="05" title="the fruits of my passions" />
-            <p style={{ margin: 0, fontSize: 18, fontWeight: 300, display: "flex", gap: 18, alignItems: "baseline" }}>
+            <p className="rh-passions" style={{ margin: 0, fontSize: 18, fontWeight: 300, display: "flex", gap: 18, alignItems: "baseline" }}>
               <a className="rh-ul" href="/poetry" style={{ textDecoration: "none", color: "inherit" }}>poetry</a>
               <span className="rh-muted">/</span>
               <a className="rh-ul" href="/photography" style={{ textDecoration: "none", color: "inherit" }}>photography</a>
@@ -250,7 +208,7 @@ export default function Home() {
             <p style={{ margin: "0 0 22px", fontSize: 25, fontWeight: 300, lineHeight: 1.35, maxWidth: "24ch" }}>
               always glad to talk <span style={{ fontStyle: "italic" }}>models, code, or a good poem.</span>
             </p>
-            <div style={{ display: "flex", gap: 24 }}>
+            <div className="rh-connect-links" style={{ display: "flex", gap: 24 }}>
               <a className="rh-ul" style={mono({ fontSize: 13 })} href="mailto:rayyanshuda@gmail.com">email</a>
               <a className="rh-ul" style={mono({ fontSize: 13 })} href="https://www.linkedin.com/in/rayyanhuda/" target="_blank" rel="noreferrer">linkedin</a>
               <a className="rh-ul" style={mono({ fontSize: 13 })} href="https://x.com/rayyanshuda" target="_blank" rel="noreferrer">twitter</a>
@@ -259,4 +217,9 @@ export default function Home() {
           </section>
     </RhPageShell>
   );
+}
+
+export default function Home() {
+  const look = useSiteTheme();
+  return hasAltHome(look) ? <AltHome look={look} /> : <ClassicHome />;
 }

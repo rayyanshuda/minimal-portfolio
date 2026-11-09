@@ -1,0 +1,53 @@
+/* ------------------------------------------------------------------ *
+ *  Site themes: classic (globals.css), broadsheet ("newspaper"), record store ("music"). The active theme is <html data-site-theme>; see app/lib/site-theme.ts.
+ *  Each theme's page frame lives in app/components/themed-shells/.
+ * ------------------------------------------------------------------ */
+
+:root {
+  /* fractal noise tile; used as a mask so grain takes on any color */
+  --rh-grain-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.6 -0.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* The boot script sets data-site-theme before first paint; hide the page until React has
+   rendered that theme (theme-root.tsx sets data-site-ready) so the classic layout never flashes. */
+:root[data-site-theme]:not([data-site-ready]) body {
+  opacity: 0;
+}
+
+/* Palettes. Content styled by globals.css reads these variables, so poems, essays and papers
+   pick up each theme's colors without per-page changes. body is listed too because the classic
+   frame also sets its palette on <body>. */
+:root[data-site-theme="newspaper"],
+:root[data-site-theme="newspaper"] body {
+  --bg: #f8f6f0;
+  --text: #121212;
+  --muted: #5a5a5a;
+  --divider: #cfcbc0;
+  --underline: #8a8578;
+  --underline-hover: #121212;
+  --hover-surface: #efece4;
+  --hover-border: #d9d5ca;
+  --spotify-card-bg: #efece4;
+  --spotify-card-text: #121212;
+  --spotify-card-subtle: #5a5a5a;
+}
+
+:root[data-site-theme="music"],
+:root[data-site-theme="music"] body {
+  --bg: #f4ecdc;
+  --text: #1e2430;
+  --muted: #6a6e77;
+  --divider: #ddd2bf;
+  --underline: #b8ab97;
+  --underline-hover: #c8323a;
+  --hover-surface: #ece3d1;
+  --hover-border: #ddd2bf;
+  --spotify-card-bg: #ece3d1;
+  --spotify-card-text: #1e2430;
+  --spotify-card-subtle: #6a6e77;
+}
+
+/* classic frame: inactive entries in the theme list are muted */
+.rh-aside-theme-btn:not(.is-active) {
+  color: var(--muted);
+}

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./site-themes.css";
 import "katex/dist/katex.min.css";
+import ThemeRoot from "./components/theme-root";
+import { SITE_THEME_BOOT_SCRIPT } from "./lib/site-theme-boot";
 
 export const metadata: Metadata = {
   title: "Rayyan Huda's Portfolio",
@@ -21,12 +24,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <head>
+        {/* set the visitor's theme before first paint (see app/lib/site-theme.ts) */}
+        <script dangerouslySetInnerHTML={{ __html: SITE_THEME_BOOT_SCRIPT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Spline+Sans+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
         <link
@@ -37,7 +42,10 @@ export default function RootLayout({
           referrerPolicy="no-referrer"
         />
       </head>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        {children}
+        <ThemeRoot />
+      </body>
     </html>
   );
 }

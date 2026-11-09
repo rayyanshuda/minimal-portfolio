@@ -1,0 +1,603 @@
+/* Page frame for the broadsheet / record store themes (themed-shell.tsx).
+   Colors come from the palette variables in app/site-themes.css. */
+
+body:has(> .ts) {
+  display: block;
+}
+
+.ts {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  /* column layout so the footer sits at the bottom of the screen on short pages */
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--rh-serif);
+}
+
+.ts a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ts-label {
+  margin: 0;
+  font-family: var(--ts-label-font);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ts-muted {
+  color: var(--muted);
+}
+
+/* ---------------- top bar ---------------- */
+.ts-top {
+  position: relative;
+}
+
+.ts-top-inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 16px 32px;
+}
+
+.ts-top-meta {
+  justify-self: end;
+  color: var(--muted);
+}
+
+.ts-back:hover {
+  color: var(--ts-accent);
+}
+
+/* ---------------- frame ---------------- */
+.ts-frame {
+  flex: 1 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr) 210px;
+  gap: 48px;
+  align-items: start;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 32px 70px;
+}
+
+.ts-left,
+.ts-right {
+  position: sticky;
+  top: 24px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* the page's own content: undo the classic column sizing */
+.ts .ts-main.rh-main {
+  grid-column: auto;
+  width: 100%;
+  min-width: 0;
+  max-width: 680px;
+  justify-self: center;
+}
+
+.ts-head {
+  display: block;
+  margin: 0 0 8px;
+  padding-bottom: 6px;
+  color: var(--ts-head-color, var(--text));
+  border-bottom: 1px solid var(--ts-rule, var(--divider));
+}
+
+/* ---- contents ---- */
+.ts-contents > summary {
+  list-style: none;
+  cursor: default;
+}
+
+.ts-contents > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ts-nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.ts-nav-item {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 6px;
+  align-items: baseline;
+  width: 100%;
+  padding: 8px 0;
+  border: 0;
+  border-bottom: 1px solid var(--divider);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+/* contents labels sometimes carry the classic frame's own numbers; the skin numbers instead */
+.ts-nav-item .rh-clink-num {
+  display: none;
+}
+
+.ts-num {
+  font-family: var(--ts-label-font);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--ts-accent);
+}
+
+.ts-nav-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.ts-nav-item:hover .ts-nav-text {
+  color: var(--ts-accent);
+}
+
+/* ---- right rail ---- */
+.ts-block + .ts-block {
+  margin-top: 28px;
+}
+
+.ts-themes {
+  display: flex;
+  flex-direction: column;
+}
+
+.ts-theme {
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.ts-theme:hover,
+.ts-theme.is-active {
+  color: var(--text);
+}
+
+.ts-spotify {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.ts-spotify-art {
+  position: relative;
+  display: block;
+  width: 54px;
+  height: 54px;
+  overflow: hidden;
+  background: var(--hover-surface);
+}
+
+.ts-spotify-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ts-spotify-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ts-spotify-status {
+  font-size: 9px;
+  color: var(--muted);
+}
+
+.ts-spotify-title,
+.ts-spotify-artist {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ts-spotify-title {
+  font-size: 15px;
+}
+
+.ts-spotify-artist {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.ts-spotify:hover .ts-spotify-title {
+  color: var(--ts-accent);
+}
+
+.ts-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+}
+
+.ts-profile img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* ---- the page header inside main (RhSiteHeader) ---- */
+.ts .rh-site-header__avatar,
+.ts .rh-bubble {
+  display: none;
+}
+
+.ts-footer {
+  text-align: center;
+}
+
+.ts-footer .ts-label {
+  padding: 18px 16px 30px;
+  color: var(--muted);
+}
+
+/* ================================================================ */
+/*  broadsheet                                                       */
+/* ================================================================ */
+.ts--newspaper {
+  --ts-label-font: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  --ts-accent: #121212;
+  --ts-rule: #121212;
+}
+
+.ts--newspaper .ts-label {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.ts--newspaper .ts-top-inner {
+  border-bottom: 3px double #121212;
+}
+
+.ts--newspaper .ts-brand {
+  font-family: "UnifrakturMaguntia", var(--rh-serif);
+  font-size: 34px;
+  line-height: 1;
+}
+
+.ts--newspaper .ts-frame {
+  gap: 0;
+}
+
+.ts--newspaper .ts-left {
+  padding-right: 24px;
+  border-right: 1px solid var(--divider);
+}
+
+.ts--newspaper .ts-right {
+  padding-left: 24px;
+  border-left: 1px solid var(--divider);
+}
+
+.ts--newspaper .ts-main {
+  padding: 0 28px;
+}
+
+.ts--newspaper .ts-head {
+  font-weight: 800;
+}
+
+/* index style: title ........ A3 */
+.ts--newspaper .ts-nav-item {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.ts--newspaper .ts-num {
+  order: 2;
+  font-weight: 700;
+}
+
+.ts--newspaper .ts-nav-text,
+.ts--newspaper .ts-theme,
+.ts--newspaper .ts-spotify-title,
+.ts--newspaper .ts-profile {
+  font-family: "Libre Caslon Text", Georgia, serif;
+}
+
+.ts--newspaper .ts-nav-item.is-active .ts-nav-text,
+.ts--newspaper .ts-theme.is-active {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ts--newspaper .ts-spotify-art img {
+  filter: grayscale(1) contrast(1.05);
+}
+
+.ts--newspaper .rh-site-header__title {
+  font-family: "Libre Caslon Text", Georgia, serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.ts--newspaper .rh-site-header__caption,
+.ts--newspaper .rh-site-header__subtitle {
+  font-family: "Libre Franklin", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ts--newspaper .rh-site-header__divider {
+  height: 3px;
+  background: none;
+  border-top: 1px solid #121212;
+  border-bottom: 1px solid #121212;
+}
+
+.ts--newspaper .ts-footer .ts-label {
+  max-width: 1116px;
+  margin: 0 auto;
+  border-top: 3px double #121212;
+}
+
+/* ================================================================ */
+/*  record store                                                     */
+/* ================================================================ */
+.ts--music {
+  --ts-label-font: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --ts-accent: #c8323a;
+  --ts-head-color: #1d3557;
+  --ts-rule: #1d3557;
+}
+
+.ts--music::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 30, 15, 0.2);
+  mask-image: var(--rh-grain-mask);
+  mask-size: 220px 220px;
+  pointer-events: none;
+}
+
+.ts--music .ts-label {
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.ts-stripes {
+  height: 16px;
+  background: linear-gradient(
+    to bottom,
+    #1d3557 0 7px,
+    transparent 7px 9px,
+    #c8323a 9px 13px,
+    transparent 13px 14px,
+    #1d3557 14px 16px
+  );
+}
+
+.ts--music .ts-brand {
+  font-family: "Shrikhand", var(--rh-serif);
+  font-size: 30px;
+  color: #1d3557;
+  text-shadow: 2px 2px 0 #c8323a;
+}
+
+.ts--music .ts-top-meta {
+  color: #c8323a;
+}
+/* Spotify art as a little record */
+.ts--music .rh-site-header__title {
+  font-family: "Shrikhand", var(--rh-serif);
+  font-size: 60px;
+  color: #1d3557;
+  text-shadow: 3px 3px 0 #c8323a;
+}
+
+.ts--music .rh-site-header__caption,
+.ts--music .rh-site-header__subtitle {
+  font-family: "Archivo", sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #1d3557;
+}
+
+.ts--music .rh-site-header__divider {
+  height: 2px;
+  background: #1d3557;
+}
+
+/* ---- record store: page content ---- */
+.ts--music .rh-site-header__lede {
+  font-size: 19px;
+}
+
+/* labels written in the classic mono font switch to the record store's italic caps */
+.ts--music .rh-main [style*="Spline Sans Mono"] {
+  font-family: "Archivo", sans-serif !important;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase;
+}
+
+/* ================================================================ */
+/*  phones / tablets                                                 */
+/* ================================================================ */
+@media (max-width: 900px) {
+  .ts-top-inner {
+    grid-template-columns: 1fr auto;
+    padding: 12px 16px;
+  }
+
+  .ts-top-meta {
+    display: none;
+  }
+
+  .ts-frame,
+  .ts--newspaper .ts-frame {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+    padding: 20px 16px 50px;
+  }
+
+  .ts-left:empty {
+    display: none;
+  }
+
+  .ts-left,
+  .ts-right {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .ts--newspaper .ts-left,
+  .ts--newspaper .ts-right {
+    padding: 0;
+    border: 0;
+  }
+
+  .ts--newspaper .ts-main {
+    padding: 0;
+  }
+
+  .ts-right {
+    order: 3;
+    padding-top: 22px;
+    border-top: 1px solid var(--divider);
+  }
+
+  .ts-top-spacer {
+    display: none;
+  }
+
+  .ts--music .ts-top-inner {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  /* record store: the tracklist heading is the collapse toggle */
+  .ts-left.rr .ts-contents > summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--rr-rule);
+  }
+
+  .ts-left.rr .ts-contents > summary .rr-head {
+    margin: 0;
+    border: 0;
+  }
+
+  .ts-left.rr .ts-contents > summary::after {
+    font-family: var(--rr-label);
+    color: var(--rr-red);
+  }
+
+  /* collapsible contents on phones */
+  .ts-contents > summary {
+    cursor: pointer;
+  }
+
+  .ts-contents > summary::after {
+    content: " +";
+  }
+
+  .ts-contents[open] > summary::after {
+    content: " –";
+  }
+
+  .ts .ts-main.rh-main {
+    max-width: none;
+  }
+
+  .ts--music .rh-site-header__title {
+    font-size: 44px;
+  }
+}
+
+/* ================================================================ */
+/*  page entrance: the content drops in, a beat at a time            */
+/* ================================================================ */
+@keyframes ts-drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* record store page titles slide out like a record from its sleeve */
+@keyframes ts-slide-out {
+  from {
+    opacity: 0;
+    transform: translateX(-36px) rotate(-3deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ts .ts-main > * {
+  animation: ts-drop-in 640ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.ts .ts-main > :nth-child(2) {
+  animation-delay: 110ms;
+}
+
+.ts .ts-main > :nth-child(3) {
+  animation-delay: 200ms;
+}
+
+.ts .ts-main > :nth-child(n + 4) {
+  animation-delay: 280ms;
+}
+
+.ts--music .ts-main .rh-site-header__title {
+  animation: ts-slide-out 760ms 60ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts .ts-main > *,
+  .ts--music .ts-main .rh-site-header__title {
+    animation: none;
+  }
+}

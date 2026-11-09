@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 export type SpotifyWidgetData = {
   isPlaying: boolean;
@@ -26,12 +26,17 @@ type Snapshot = {
 
 let cachedData: SpotifyWidgetData | null = null;
 let cachedError = "";
-let listeners = new Set<() => void>();
+const listeners = new Set<() => void>();
 let fetchInFlight: Promise<void> | null = null;
 let pollingStarted = false;
 let pollTimeoutId: number | null = null;
 
+// stable snapshot object for useSyncExternalStore; replaced whenever the data changes
+const EMPTY_SNAPSHOT: Snapshot = { data: null, error: "" };
+let snapshot: Snapshot = EMPTY_SNAPSHOT;
+
 function notify() {
+  snapshot = { data: cachedData, error: cachedError };
   for (const listener of listeners) listener();
 }
 
@@ -52,10 +57,6 @@ function writeSession(data: SpotifyWidgetData) {
   } catch {
     // ignore quota / private mode
   }
-}
-
-function getSnapshot(): Snapshot {
-  return { data: cachedData, error: cachedError };
 }
 
 function pollDelayMs() {
@@ -159,18 +160,18 @@ function startPolling() {
 }
 
 export function useSpotifyWidget(): Snapshot {
-  const [snapshot, setSnapshot] = useState<Snapshot>(() => {
-    if (typeof window === "undefined") return { data: null, error: "" };
-    if (!cachedData) cachedData = readSession();
-    return getSnapshot();
-  });
-
   useEffect(() => {
-    if (!cachedData) cachedData = readSession();
-    setSnapshot(getSnapshot());
+    // read the session cache after hydration, so server and client render the same first frame
+    if (!cachedData) {
+      cachedData = readSession();
+      if (cachedData) notify();
+    }
     startPolling();
-    return subscribeSpotify(() => setSnapshot(getSnapshot()));
   }, []);
 
-  return snapshot;
+  return useSyncExternalStore(
+    subscribeSpotify,
+    () => snapshot,
+    () => EMPTY_SNAPSHOT,
+  );
 }

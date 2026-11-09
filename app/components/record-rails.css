@@ -1,0 +1,274 @@
+/* Record store side rails (record-rails.tsx). Self-contained: .rr carries its own palette so the
+   rails look identical on the homepage and inside the page frame. */
+
+.rr {
+  --rr-cream: #f4ecdc;
+  --rr-ink: #1e2430;
+  --rr-navy: #1d3557;
+  --rr-red: #c8323a;
+  --rr-muted: #6a6e77;
+  --rr-rule: #ddd2bf;
+  --rr-label: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  color: var(--rr-ink);
+  font-family: var(--rh-serif);
+  text-align: left;
+}
+
+.rr a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.rr-cap {
+  margin: 0;
+  font-family: var(--rr-label);
+  font-size: 10.5px;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rr-muted);
+}
+
+.rr-cap.rr-red,
+.rr-red {
+  color: var(--rr-red);
+}
+
+.rr-head {
+  display: block;
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rr-rule);
+}
+
+.rr-block + .rr-block {
+  margin-top: 34px;
+}
+
+/* ---- tracklist ---- */
+.rr-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rr-list a,
+.rr-list button {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 0 6px 16px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.3;
+  text-align: left;
+  color: var(--rr-muted);
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+/* the needle: a red dot on the track you're on */
+.rr-list a::before,
+.rr-list button::before {
+  content: "";
+  position: absolute;
+  top: 0.95em;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: var(--rr-red);
+  transform: scale(0);
+  transition: transform 220ms ease;
+}
+
+.rr-list a:hover,
+.rr-list button:hover,
+.rr-list .is-active {
+  color: var(--rr-navy);
+}
+
+.rr-list .is-active::before {
+  transform: scale(1);
+}
+
+.rr-num {
+  flex: none;
+  font-family: var(--rr-label);
+  font-size: 11px;
+  font-style: italic;
+  font-weight: 800;
+  color: var(--rr-red);
+}
+
+/* classic contents labels sometimes carry their own numbers; the rail numbers instead */
+.rr-list-text .rh-clink-num {
+  display: none;
+}
+
+/* ---- theme ---- */
+.rr-themes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rr-theme {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1.5px solid var(--rr-rule);
+  border-radius: 999px;
+  background: none;
+  font-family: var(--rr-label);
+  font-size: 10px;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--rr-navy);
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.rr-theme:hover {
+  border-color: var(--rr-navy);
+}
+
+.rr-theme.is-active {
+  border-color: var(--rr-navy);
+  background: var(--rr-navy);
+  color: var(--rr-cream);
+}
+
+/* ---- now spinning ---- */
+.rr-spin {
+  display: flex;
+  flex-direction: column;
+}
+
+.rr-spin-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rr-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c4c8ce;
+}
+
+.rr-dot.is-live {
+  background: var(--rr-red);
+  box-shadow: 0 0 0 3px rgba(200, 50, 58, 0.2);
+}
+
+.rr-spin-track {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin-bottom: 10px;
+}
+
+.rr-spin-art {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  box-shadow: 0 4px 10px rgba(20, 30, 50, 0.22);
+}
+
+.rr-spin-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rr-spin-title,
+.rr-spin-artist {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rr-spin-title {
+  font-size: 15px;
+  line-height: 1.25;
+  transition: color 160ms ease;
+}
+
+.rr-spin-artist {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--rr-muted);
+}
+
+.rr-spin:hover .rr-spin-title {
+  color: var(--rr-red);
+}
+
+.rr-wave {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 210px;
+  height: 26px;
+}
+
+.rr-wave i {
+  display: block;
+  flex: 1;
+  min-width: 1px;
+  border-radius: 1px;
+  background: #c3b8a4;
+  transform-origin: center;
+}
+
+.rr-spin.is-live .rr-wave i {
+  background: var(--rr-red);
+  animation: rr-eq 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes rr-eq {
+  from {
+    transform: scaleY(0.3);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* ---- listener ---- */
+.rr-listener {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.rr-listener img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.rr-listener:hover span {
+  color: var(--rr-red);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rr-spin.is-live .rr-wave i {
+    animation: none;
+  }
+}

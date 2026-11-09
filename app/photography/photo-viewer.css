@@ -1,0 +1,182 @@
+/* Photo close-up for classic + broadsheet (photo-viewer.tsx). Same layout as the record store
+   turntable: photo on the left, caption / date / controls on the right. Colors come from the
+   page's theme variables. */
+
+.pv {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--bg) 98%, transparent);
+  color: var(--text);
+  cursor: zoom-out;
+  animation: pv-fade 200ms ease;
+}
+
+.pv-deck {
+  display: flex;
+  align-items: center;
+  gap: clamp(28px, 4vw, 64px);
+  max-width: 1100px;
+  cursor: default;
+}
+
+.pv-figure {
+  margin: 0;
+  animation: pv-rise 380ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.pv-photo {
+  display: block;
+  max-width: min(58vw, 760px);
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+.pv-info {
+  width: min(300px, 80vw);
+  animation: pv-fade 420ms 80ms ease both;
+}
+
+.pv-label {
+  margin: 0;
+}
+
+.pv-caption {
+  margin: 12px 0;
+  font-size: 24px;
+  line-height: 1.35;
+}
+
+.pv-date {
+  color: var(--muted);
+}
+
+.pv-controls {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+
+.pv-controls button {
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+@keyframes pv-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pv-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+}
+
+/* ---------------- classic: soft shadow, mono labels, underlined text links ---------------- */
+.pv--classic .pv-photo {
+  border-radius: 2px;
+  box-shadow: 0 18px 44px rgba(40, 30, 20, 0.22), 0 2px 6px rgba(40, 30, 20, 0.12);
+}
+
+.pv--classic .pv-label {
+  font-family: "Spline Sans Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pv--classic .pv-kicker {
+  color: var(--muted);
+}
+
+.pv--classic .pv-caption {
+  font-family: var(--rh-serif);
+}
+
+.pv--classic .pv-controls {
+  gap: 18px;
+}
+
+.pv--classic .pv-controls button {
+  padding: 0 0 2px;
+  border-bottom: 1px solid var(--underline);
+  transition: border-color 160ms ease;
+}
+
+.pv--classic .pv-controls button:hover {
+  border-bottom-color: var(--underline-hover);
+}
+
+/* ---------------- broadsheet: plate with a hairline frame, caption set like a photo caption ---------------- */
+.pv--newspaper .pv-photo {
+  padding: 8px;
+  border: 1px solid #121212;
+  background: #fff;
+}
+
+.pv--newspaper .pv-label {
+  font-family: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pv--newspaper .pv-kicker {
+  padding-bottom: 8px;
+  border-bottom: 3px double #121212;
+}
+
+.pv--newspaper .pv-caption {
+  font-family: "Libre Caslon Text", Georgia, serif;
+  font-size: 23px;
+  font-style: italic;
+}
+
+.pv--newspaper .pv-controls {
+  border-top: 1px solid #121212;
+  border-bottom: 1px solid #121212;
+}
+
+.pv--newspaper .pv-controls button {
+  flex: 1;
+  padding: 10px 6px;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.pv--newspaper .pv-controls button + button {
+  border-left: 1px solid #121212;
+}
+
+.pv--newspaper .pv-controls button:hover {
+  background: #121212;
+  color: var(--bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pv,
+  .pv-figure,
+  .pv-info {
+    animation: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .pv-deck {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .pv-photo {
+    max-width: 86vw;
+    max-height: 56vh;
+  }
+}

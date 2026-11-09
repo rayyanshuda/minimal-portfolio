@@ -86,7 +86,10 @@ async function refreshAccessToken(): Promise<string> {
 
   if (!response.ok) {
     cachedAccessToken = null;
-    throw new Error("Failed to refresh Spotify access token.");
+    const body = (await response.json().catch(() => ({}))) as { error?: string; error_description?: string };
+    throw new Error(
+      `Failed to refresh Spotify access token (${response.status} ${body.error ?? ""}: ${body.error_description ?? ""}).`,
+    );
   }
 
   const json = (await response.json()) as { access_token?: string; expires_in?: number };
@@ -352,7 +355,8 @@ export async function GET() {
   try {
     const payload = await spotifyFetchInFlight;
     return jsonOk(payload);
-  } catch {
+  } catch (err) {
+    console.error("[spotify]", err);
     if (lastGoodPayload) {
       const stale = { ...lastGoodPayload, isPlaying: false };
       cachedPayload = { data: stale, fetchedAtMs: Date.now() };

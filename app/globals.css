@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 :root {
+  --rh-serif: "Fraunces", Georgia, serif;
+  --rh-prose-weight: 400;
   --bg: #000000;
   --text: #dbdbdb;
   --muted: #909090;
@@ -716,144 +718,6 @@ body:has(> .rh-page) {
   margin-top: 0;
 }
 
-.photography-grid {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  margin: 0 -0.25rem;
-}
-
-.photo-column {
-  flex: 25%;
-  max-width: 25%;
-  padding: 0 0.25rem;
-}
-
-.photo-card {
-  position: relative;
-  width: 100%;
-  margin-top: 0.5rem;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-  perspective: 1200px;
-}
-
-.photo-card-inner {
-  display: grid;
-  position: relative;
-  width: 100%;
-  transform-style: preserve-3d;
-  transition: transform 420ms ease;
-}
-
-.photo-card-face {
-  grid-area: 1 / 1;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.photo-card-front img {
-  width: 100%;
-  height: auto;
-  object-fit: initial;
-  display: block;
-}
-
-.photo-card-back {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border: 0;
-  color: var(--text);
-  transform: rotateY(180deg);
-}
-
-.photo-card-back-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scaleX(-1) scale(1.08);
-  filter: blur(7px);
-}
-
-.photo-card-back-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
-  gap: 0.45rem;
-  padding: 0.5rem;
-  text-align: center;
-}
-
-.photo-card-inner.is-flipped .photo-card-back {
-  pointer-events: auto;
-}
-
-.photo-card-inner.is-flipped {
-  transform: rotateY(180deg);
-}
-
-/* caption + date sit on fixed off-white "paper" (not theme colors) so they stay legible on any photo */
-/* both boxes have a max size; FitText (photography/page.tsx) shrinks the text only once it would overflow.
-   padding is in em so the box frame shrinks along with the text. */
-.photo-caption {
-  display: block;
-  flex: 0 1 auto;
-  box-sizing: border-box;
-  max-width: 100%;
-  max-height: 78%;
-  min-height: 0;
-  overflow: hidden;
-  padding: 0.7em 0.75em 1.35em;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 2px;
-  background: #f6f3ec;
-  color: #1d1b18;
-  font-size: 0.95rem;
-  line-height: 1.35;
-  text-align: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.2);
-  transform: rotate(-1.2deg);
-}
-
-.photo-date {
-  display: block;
-  flex: 0 0 auto;
-  align-self: center;
-  box-sizing: border-box;
-  width: fit-content;
-  max-width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  padding: 0.35em 0.6em;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 2px;
-  background: #f6f3ec;
-  color: #4a463f;
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  text-align: center;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.18);
-  transform: rotate(1.5deg);
-}
-
-.photo-card:focus-visible {
-  outline: 1px solid var(--underline-hover);
-  outline-offset: 2px;
-}
-
 .divider {
   margin-top: 1.2rem;
   height: 1px;
@@ -1378,7 +1242,7 @@ body:has(> .rh-page) {
     transition: transform 180ms ease;
     padding: 54px 20px 24px;
     pointer-events: none;
-    font-family: "Spectral", Georgia, serif;
+    font-family: var(--rh-serif);
     font-size: 16px;
     color: var(--text);
     box-sizing: border-box;
@@ -1438,7 +1302,7 @@ body:has(> .rh-page) {
     transition: transform 220ms ease;
     z-index: 44;
     pointer-events: none;
-    font-family: "Spectral", Georgia, serif;
+    font-family: var(--rh-serif);
     font-size: 16px;
     color: var(--text);
     box-sizing: border-box;
@@ -1469,15 +1333,6 @@ body:has(> .rh-page) {
 
   .speech-bubble {
     display: none;
-  }
-
-  .photography-grid {
-    margin: 0 -0.25rem;
-  }
-
-  .photo-column {
-    flex: 50%;
-    max-width: 50%;
   }
 
   .section h2 {
@@ -1550,13 +1405,14 @@ body:has(> .rh-page) {
   inset: 0;
   font-family: var(--rh-grid-font);
   font-size: var(--rh-grid-size);
-  background-image: radial-gradient(circle, var(--rh-grid-dot) 0.75px, transparent 0.75px);
-  background-size: 1ch 1ex;
-  background-position: center top;
+  /* paper grain: the theme's dot color shown through a noise mask */
+  background: var(--rh-grid-dot);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.6 -0.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mask-size: 220px 220px;
 }
 
 .rh-page .rh-shell {
-  font-family: "Spectral", Georgia, serif;
+  font-family: var(--rh-serif);
   font-size: 16px;
 }
 
@@ -1602,6 +1458,7 @@ body:has(> .rh-page) {
   );
   pointer-events: none;
 }
+
 
 [data-theme="midnight"] .rh-page {
   --rh-grid-dot: rgba(255, 255, 255, 0.14);
@@ -1705,7 +1562,7 @@ body:has(> .rh-page) {
   background: none;
   text-align: left;
   cursor: pointer;
-  font-family: "Spectral", Georgia, serif;
+  font-family: var(--rh-serif);
   font-size: 16px;
   line-height: 1.4;
   text-decoration: none;
@@ -1727,7 +1584,7 @@ body:has(> .rh-page) {
   border: 0;
   padding: 0;
   cursor: pointer;
-  font-family: "Spectral", Georgia, serif;
+  font-family: var(--rh-serif);
   font-size: 16px;
   line-height: 1.4;
   color: inherit;
@@ -1861,7 +1718,7 @@ body:has(> .rh-page) {
   margin: 24px 0 0;
   font-size: 18px;
   line-height: 1.62;
-  font-weight: 300;
+  font-weight: var(--rh-prose-weight);
   max-width: 52ch;
 }
 
@@ -2119,14 +1976,14 @@ body:has(> .rh-page) {
   margin: 0 0 0.4rem;
   font-size: 1rem;
   line-height: 1.62;
-  font-weight: 300;
+  font-weight: var(--rh-prose-weight);
 }
 
 .rh-main .rh-poem-body {
   margin: 0;
   font-size: 1rem;
   line-height: 1.62;
-  font-weight: 300;
+  font-weight: var(--rh-prose-weight);
 }
 
 .rh-main img,
@@ -2134,17 +1991,6 @@ body:has(> .rh-page) {
 .rh-main .project-model-box,
 .rh-main .gumball-model-box {
   max-width: 100%;
-}
-
-.rh-main .photo-date {
-  font-family: "Spline Sans Mono", monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.05em;
-}
-
-.rh-main .photo-caption {
-  font-size: 0.95rem;
-  font-weight: 400;
 }
 
 @media (min-width: 761px) {

@@ -1,0 +1,84 @@
+.rh-paint {
+  position: fixed;
+  inset: 0;
+  z-index: 9998; /* above every layout, below the dev panel */
+  pointer-events: auto;
+  transition: opacity 520ms ease, filter 520ms ease, transform 520ms ease;
+}
+
+/* only the paint layer itself, never SVGs inside the new page copy */
+.rh-paint > svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.rh-paint-stroke {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation-name: rh-paint-stroke;
+  animation-timing-function: cubic-bezier(0.55, 0.05, 0.3, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes rh-paint-stroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.rh-paint-coat {
+  position: absolute;
+  inset: 0;
+  background: var(--paint-bg);
+  opacity: 0;
+  animation: rh-paint-coat 140ms ease forwards;
+  animation-delay: var(--cover-end);
+}
+
+@keyframes rh-paint-coat {
+  to {
+    opacity: 1;
+  }
+}
+
+/* the paint "dries" into the new page */
+.rh-paint.is-revealing {
+  opacity: 0;
+  filter: blur(6px);
+  transform: scale(1.02);
+  pointer-events: none;
+}
+
+/* ---------- reveal mode ---------- */
+.rh-paint--reveal {
+  transition: none;
+}
+
+/* full copy of the new page; transform makes its position:fixed layers stay inside this box */
+.rh-paint-newpage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transform: translateZ(0);
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+}
+
+.rh-paint-accents {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* the accent paint soaks into the page as the last bands land */
+  animation: rh-paint-dry 420ms ease forwards;
+  animation-delay: calc(var(--cover-end) - 260ms);
+}
+
+@keyframes rh-paint-dry {
+  to {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}

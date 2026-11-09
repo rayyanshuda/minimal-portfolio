@@ -1,16 +1,16 @@
 "use client";
 
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+// Photography. Record store: a journal of spinning records. Classic and broadsheet: the photo journal
+// (by year). Clicking a photo opens a close-up (large photo, caption, date, previous / close / next):
+// the turntable on record store, PhotoViewer dressed for the theme on the others.
+import { useState } from "react";
 import RhPageShell from "@/app/components/rh-page-shell";
 import RhSubpageHeader from "@/app/components/rh-subpage-header";
-
-type PhotoCard = {
-  id: string;
-  src: string;
-  alt: string;
-  caption: string;
-  date: string;
-};
+import { JournalLayout, type PhotoCard } from "./layouts";
+import "./layouts.css";
+import PhotoViewer from "./photo-viewer";
+import RecordJournal, { Turntable } from "./record-store-photos";
+import { useSiteTheme } from "@/app/lib/site-theme";
 
 // Newest at the top — add new pics at the top as photo-32, photo-33, etc. photo-1 is oldest (bottom).
 const photoCards: PhotoCard[] = [
@@ -235,82 +235,34 @@ const photoCards: PhotoCard[] = [
 
 // Text box that keeps its normal CSS font size, and only shrinks the text once the
 // box has hit its max size (set in CSS) and the text would otherwise overflow.
-function FitText({ className, minPx, children }: { className: string; minPx: number; children: string }) {
-  const ref = useRef<HTMLSpanElement | null>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const fit = () => {
-      el.style.fontSize = "";
-      let size = parseFloat(window.getComputedStyle(el).fontSize);
-      const overflows = () => el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1;
-      while (overflows() && size > minPx) {
-        size = Math.max(size - 0.5, minPx);
-        el.style.fontSize = `${size}px`;
-      }
-    };
-
-    fit();
-    // refit when the card resizes (lazy-loaded image, window resize)
-    const observer = new ResizeObserver(fit);
-    if (el.parentElement) observer.observe(el.parentElement);
-    // refit once web fonts swap in (Google Fonts uses display=swap, so the first fit uses the fallback font)
-    let cancelled = false;
-    document.fonts.ready.then(() => {
-      if (!cancelled) fit();
-    });
-    document.fonts.addEventListener("loadingdone", fit);
-    return () => {
-      cancelled = true;
-      observer.disconnect();
-      document.fonts.removeEventListener("loadingdone", fit);
-    };
-  }, [children, minPx]);
-
-  return (
-    <span ref={ref} className={className}>
-      {children}
-    </span>
-  );
-}
 
 export default function PhotographyPage() {
-  const [flippedIds, setFlippedIds] = useState<Set<string>>(() => new Set());
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const siteTheme = useSiteTheme();
 
-  const toggleFlipped = (photoId: string) => {
-    setFlippedIds((current) => {
-      const next = new Set(current);
-      if (next.has(photoId)) {
-        next.delete(photoId);
-      } else {
-        next.add(photoId);
-      }
-      return next;
-    });
-  };
+  const closeUp =
+    openIndex === null ? null : siteTheme === "music" ? (
+      <Turntable photos={photoCards} index={openIndex} onClose={() => setOpenIndex(null)} onNav={setOpenIndex} />
+    ) : (
+      <PhotoViewer
+        look={siteTheme}
+        photos={photoCards}
+        index={openIndex}
+        onClose={() => setOpenIndex(null)}
+        onNav={setOpenIndex}
+      />
+    );
 
-  const handleFlipKeyDown = (event: KeyboardEvent<HTMLButtonElement>, photoId: string) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    toggleFlipped(photoId);
-  };
-
-  const photoColumns = photoCards.reduce<PhotoCard[][]>(
-    (columns, photo, index) => {
-      columns[index % 4].push(photo);
-      return columns;
-    },
-    [[], [], [], []],
-  );
-
-  const scrollToPhotographySection = () => {
-    const target = document.getElementById("photography");
-    if (!target) return;
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
-    window.history.replaceState(null, "", "#photography");
-  };
+  // record store: the tracklist column stays, empty
+  if (siteTheme === "music") {
+    return (
+      <RhPageShell activeContentId="" contentsItems={[]}>
+        <RhSubpageHeader title="photography" caption={`${photoCards.length} records · click one to give it a spin`} />
+        <RecordJournal photos={photoCards} onOpen={setOpenIndex} />
+        {closeUp}
+      </RhPageShell>
+    );
+  }
 
   return (
     <RhPageShell
@@ -325,56 +277,15 @@ export default function PhotographyPage() {
             </>
           ),
           href: "#photography",
-          onSelect: scrollToPhotographySection,
+          onSelect: () => document.getElementById("photography")?.scrollIntoView({ behavior: "smooth", block: "start" }),
         },
       ]}
     >
-      <RhSubpageHeader title="photography" caption="click on the pictures to know about them" />
-
+      <RhSubpageHeader title="photography" caption="by year, newest first. click a photo to see it up close" />
       <section className="section photography-section" id="photography" style={{ marginTop: 46 }}>
-        <div className="photography-grid">
-          {photoColumns.map((column, columnIndex) => (
-            <div key={`column-${columnIndex}`} className="photo-column">
-              {column.map((photo) => {
-                const isFlipped = flippedIds.has(photo.id);
-                return (
-                  <button
-                    key={photo.id}
-                    type="button"
-                    className="photo-card"
-                    onClick={() => toggleFlipped(photo.id)}
-                    onKeyDown={(event) => handleFlipKeyDown(event, photo.id)}
-                    aria-pressed={isFlipped}
-                    aria-label={`${photo.caption}, ${photo.date}`}
-                  >
-                    <div className={`photo-card-inner ${isFlipped ? "is-flipped" : ""}`}>
-                      <div className="photo-card-face photo-card-front">
-                        <img src={photo.src} alt={photo.alt} loading="lazy" />
-                      </div>
-                      <div className="photo-card-face photo-card-back">
-                        <img
-                          src={photo.src}
-                          alt=""
-                          aria-hidden="true"
-                          className="photo-card-back-image"
-                        />
-                        <div className="photo-card-back-content">
-                          <FitText className="photo-caption" minPx={8}>
-                            {photo.caption}
-                          </FitText>
-                          <FitText className="photo-date" minPx={7}>
-                            {photo.date}
-                          </FitText>
-                        </div>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-        </div>
+        <JournalLayout photos={photoCards} onOpen={setOpenIndex} />
       </section>
+      {closeUp}
     </RhPageShell>
   );
 }

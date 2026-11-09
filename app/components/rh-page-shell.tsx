@@ -7,6 +7,9 @@ import MobileThemeToggle from "@/app/components/mobile-theme-toggle";
 import OverflowMarquee from "@/app/components/overflow-marquee";
 import { SPOTIFY_PROFILE_URL } from "@/app/lib/spotify-constants";
 import { useSpotifyWidget, type SpotifyWidgetData } from "@/app/lib/spotify-widget-store";
+import ThemePicker from "@/app/components/theme-picker";
+import ThemedShell from "@/app/components/themed-shell";
+import { useSiteTheme } from "@/app/lib/site-theme";
 
 export type { SpotifyWidgetData };
 
@@ -19,7 +22,6 @@ export type RhContentsItem = {
   onSelect?: () => void;
 };
 
-const themeOrder: Theme[] = ["midnight", "snow", "coffee-cream", "dusty-blue"];
 
 type PaintDab = { x: number; y: number; r: number };
 
@@ -148,9 +150,8 @@ type RhPageShellProps = {
   activeContentId: string;
 };
 
-export default function RhPageShell({ children, contentsItems, activeContentId }: RhPageShellProps) {
-  const [theme, setTheme] = useState<Theme>("coffee-cream");
-  const [isThemeReady, setIsThemeReady] = useState(false);
+/** The classic frame: dotted backdrop, contents on the left, theme/Spotify/profile on the right. */
+function ClassicShell({ children, contentsItems, activeContentId }: RhPageShellProps) {
   const { data: spotifyData, error: spotifyError } = useSpotifyWidget();
   const [isGridPainting, setIsGridPainting] = useState(false);
 
@@ -168,24 +169,11 @@ export default function RhPageShell({ children, contentsItems, activeContentId }
     lastY: null as number | null,
   });
 
-  const applyTheme = (t: Theme) => {
-    document.documentElement.setAttribute("data-theme", t);
-    document.body.setAttribute("data-theme", t);
-  };
-
+  // classic has a single palette now; the other looks are separate site themes
   useEffect(() => {
-    const stored = window.localStorage.getItem("theme") as Theme | null;
-    const initial: Theme = stored && themeOrder.includes(stored) ? stored : "coffee-cream";
-    setTheme(initial);
-    applyTheme(initial);
-    setIsThemeReady(true);
+    document.documentElement.setAttribute("data-theme", "coffee-cream");
+    document.body.setAttribute("data-theme", "coffee-cream");
   }, []);
-
-  useEffect(() => {
-    if (!isThemeReady) return;
-    applyTheme(theme);
-    window.localStorage.setItem("theme", theme);
-  }, [theme, isThemeReady]);
 
   useEffect(() => {
     const pageEl = pageRef.current;
@@ -434,20 +422,8 @@ export default function RhPageShell({ children, contentsItems, activeContentId }
 
         <aside className="rh-aside-right" aria-label="Theme controls">
           <div className="rh-aside-panel rh-aside-panel--right">
-          <p className="rh-muted rh-aside-label">appearance</p>
-          <div className="rh-aside-theme-list">
-            {themeOrder.map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setTheme(t)}
-                aria-pressed={theme === t}
-                className={`rh-aside-theme-btn rh-clink${theme === t ? "" : " rh-muted"}`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
+          <p className="rh-muted rh-aside-label">theme</p>
+          <ThemePicker className="rh-aside-theme-list" itemClassName="rh-aside-theme-btn rh-clink" />
 
           <p className="rh-muted rh-aside-label">spotify</p>
           {spotifyData ? (
@@ -486,20 +462,8 @@ export default function RhPageShell({ children, contentsItems, activeContentId }
       </div>
 
       <aside className="theme-nav" aria-label="Theme controls">
-        <p className="rh-muted rh-aside-label">appearance</p>
-        <div className="rh-aside-theme-list">
-          {themeOrder.map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTheme(t)}
-              aria-pressed={theme === t}
-              className={`rh-aside-theme-btn rh-clink${theme === t ? "" : " rh-muted"}`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+        <p className="rh-muted rh-aside-label">theme</p>
+        <ThemePicker className="rh-aside-theme-list" itemClassName="rh-aside-theme-btn rh-clink" />
 
         <p className="rh-muted rh-aside-label">spotify</p>
         {spotifyData ? (
@@ -540,5 +504,15 @@ export default function RhPageShell({ children, contentsItems, activeContentId }
         </a>
       </aside>
     </div>
+  );
+}
+
+export default function RhPageShell(props: RhPageShellProps) {
+  const siteTheme = useSiteTheme();
+  if (siteTheme === "classic") return <ClassicShell {...props} />;
+  return (
+    <ThemedShell theme={siteTheme} contentsItems={props.contentsItems} activeContentId={props.activeContentId}>
+      {props.children}
+    </ThemedShell>
   );
 }
