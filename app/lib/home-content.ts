@@ -65,7 +65,7 @@ export const passions = [
 
 export const connect = {
   line: "be",
-  lineItalic: "curious. learn. connect",
+  lineItalic: "curious. learn. connect.",
   links: [
     { name: "email", href: "mailto:rayyanshuda@gmail.com" },
     { name: "linkedin", href: "https://www.linkedin.com/in/rayyanhuda/" },
