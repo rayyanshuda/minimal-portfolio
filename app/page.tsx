@@ -206,7 +206,7 @@ function ClassicHome() {
           <section id="connect" style={{ marginTop: 46, scrollMarginTop: 36 }}>
             <SectionHead n="06" title="connect" />
             <p style={{ margin: "0 0 22px", fontSize: 25, fontWeight: 300, lineHeight: 1.35, maxWidth: "24ch" }}>
-              always glad to talk <span style={{ fontStyle: "italic" }}>models, code, or a good poem.</span>
+               be <span style={{ fontStyle: "italic" }}>curious. learn. connect.</span>
             </p>
             <div className="rh-connect-links" style={{ display: "flex", gap: 24 }}>
               <a className="rh-ul" style={mono({ fontSize: 13 })} href="mailto:rayyanshuda@gmail.com">email</a>

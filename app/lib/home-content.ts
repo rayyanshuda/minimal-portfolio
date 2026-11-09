@@ -64,8 +64,8 @@ export const passions = [
 ];
 
 export const connect = {
-  line: "always glad to talk",
-  lineItalic: "models, code, or a good poem.",
+  line: "be",
+  lineItalic: "curious. learn. connect",
   links: [
     { name: "email", href: "mailto:rayyanshuda@gmail.com" },
     { name: "linkedin", href: "https://www.linkedin.com/in/rayyanhuda/" },
