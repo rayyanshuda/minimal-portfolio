@@ -12,7 +12,7 @@ if you want answers, you have to be willing to look for them. go explore.
 
 ## art
 
-I've fallen in love with countless forms of art, and although I am far from being considered an artist, I love dipping my toes in different waters to find new passions. 
+i've fallen in love with countless forms of art, and although i am far from being considered an artist, i love dipping my toes in different waters to find new passions. 
 
 a lot of people have a lot of definitions. mine is simple:
 
